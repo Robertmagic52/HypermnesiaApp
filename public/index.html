@@ -778,11 +778,11 @@
             <h4>Phase 1 Forced Details (Any Contact Opened)</h4>
             <div class="form-row">
               <label>Forced Phone Number:</label>
-              <input type="text" id="cfg-p1-phone" value="(212) 849-2041">
+              <input type="text" id="cfg-p1-phone" value="(914) 393-2342">
             </div>
             <div class="form-row">
               <label>Forced Birthday:</label>
-              <input type="text" id="cfg-p1-bday" value="October 14">
+              <input type="text" id="cfg-p1-bday" value="May 4, 1999">
             </div>
           </div>
 
@@ -791,7 +791,7 @@
             <h4>Phase 2 Forced Details (Next Contact Opened)</h4>
             <div class="form-row">
               <label>Forced Phone Number:</label>
-              <input type="text" id="cfg-p2-phone" value="(415) 672-9183">
+              <input type="text" id="cfg-p2-phone" value="(917) 929-2266">
             </div>
             <div class="form-row">
               <label>Forced Notes (Pin, Allergy, Car, etc.):</label>
@@ -827,18 +827,18 @@
 
     const SETTINGS_PIN = "2769";
     const STORAGE_KEY_CONTACTS = "hypermnesia_real_contacts_v1";
-    const STORAGE_KEY_OVERRIDES = "hypermnesia_overrides_v1";
-    const STORAGE_KEY_CONFIG = "hypermnesia_config_v1";
+    const STORAGE_KEY_OVERRIDES = "hypermnesia_overrides_v2";
+    const STORAGE_KEY_CONFIG = "hypermnesia_config_v2";
 
     // DEFAULT CONFIG
     let config = {
       triggerMode: "both", // both, scroll, count, manual
       threshold: 3,
-      p1Phone: "(212) 849-2041",
-      p1Bday: "October 14",
-      p2Phone: "(415) 672-9183",
+      p1Phone: "(914) 393-2342",
+      p1Bday: "May 4, 1999",
+      p2Phone: "(917) 929-2266",
       p2Notes: "Door Code: 4821 • Severe allergy to shellfish • Drives a 1988 Porsche 911",
-      p3Pattern: "(212) {XXX}-4912"
+      p3Pattern: "(914) {XXX}-2342"
     };
 
     // ACTIVE RUNTIME STATE
