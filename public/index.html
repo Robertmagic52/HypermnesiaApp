@@ -5,22 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Contacts</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Contacts">
-  <meta name="theme-color" content="#f2f2f7">
+  <meta name="theme-color" content="#000000">
   <link rel="apple-touch-icon" href="/icon.svg">
   <link rel="manifest" href="/manifest.json">
   <style>
     :root {
       --ios-blue: #007aff;
-      --ios-bg: #f2f2f7;
-      --ios-card-bg: #ffffff;
-      --ios-text: #000000;
+      --ios-bg-list: #000000;
+      --ios-row-bg: #000000;
+      --ios-row-active: #1c1c1e;
+      --ios-text: #ffffff;
       --ios-text-secondary: #8e8e93;
-      --ios-text-tertiary: #c7c7cc;
-      --ios-separator: #c6c6c8;
-      --ios-search-bg: #e3e3e8;
-      --ios-pill-bg: #ffffff;
+      --ios-text-tertiary: #48484a;
+      --ios-separator: rgba(255, 255, 255, 0.1);
+      --ios-search-bg: #1c1c1e;
+      --ios-avatar-bg: #2c293a;
       --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
@@ -35,7 +36,7 @@
 
     body {
       font-family: var(--font-family);
-      background-color: var(--ios-bg);
+      background-color: var(--ios-bg-list);
       color: var(--ios-text);
       overflow-x: hidden;
       height: 100vh;
@@ -43,7 +44,6 @@
       position: fixed;
     }
 
-    /* APP CONTAINER */
     #app {
       width: 100%;
       height: 100%;
@@ -57,7 +57,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: var(--ios-bg);
+      background: var(--ios-bg-list);
       display: flex;
       flex-direction: column;
       transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
@@ -75,189 +75,164 @@
     #view-detail {
       z-index: 20;
       transform: translateX(100%);
-      box-shadow: -4px 0 20px rgba(0,0,0,0.12);
+      background: linear-gradient(180deg, #37334f 0%, #252237 38%, #141322 100%);
+      box-shadow: -4px 0 25px rgba(0,0,0,0.5);
     }
     #view-detail.slide-in {
       transform: translateX(0);
     }
 
-    /* CONTACT LIST VIEW */
-    .nav-bar-large {
+    /* ========================================================
+       LIST VIEW (DARK MODE - EXACT MATCH TO USER SCREENSHOTS)
+       ======================================================== */
+    .list-header {
       padding-top: env(safe-area-inset-top, 44px);
-      background: rgba(242, 242, 247, 0.88);
+      background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-bottom: 0.5px solid rgba(0,0,0,0.15);
       position: sticky;
       top: 0;
       z-index: 100;
     }
 
-    .top-actions {
+    .list-top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 6px 16px 2px 16px;
     }
 
-    .nav-btn {
-      color: var(--ios-blue);
-      font-size: 17px;
-      font-weight: 400;
-      background: none;
+    .round-nav-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1c1c1e;
       border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
     }
 
-    .nav-btn.bold {
-      font-weight: 600;
+    .list-title-wrap {
+      text-align: center;
+      flex: 1;
     }
-
-    .large-title {
-      font-size: 34px;
-      font-weight: 700;
-      letter-spacing: -0.6px;
-      padding: 0 16px 8px 16px;
-    }
-
-    .search-wrapper {
-      padding: 0 16px 10px 16px;
-    }
-
-    .search-box {
-      background: var(--ios-search-bg);
-      border-radius: 10px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      gap: 6px;
-    }
-
-    .search-box svg {
-      width: 17px;
-      height: 17px;
-      fill: var(--ios-text-secondary);
-      flex-shrink: 0;
-    }
-
-    .search-box input {
-      border: none;
-      background: transparent;
+    .list-title-wrap h2 {
       font-size: 17px;
-      width: 100%;
-      outline: none;
-      font-family: var(--font-family);
-      color: var(--ios-text);
-      user-select: text;
-      -webkit-user-select: text;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: -0.2px;
     }
-    .search-box input::placeholder {
+    .list-title-wrap p {
+      font-size: 11px;
       color: var(--ios-text-secondary);
+      margin-top: 1px;
     }
 
-    /* SCROLLABLE CONTACTS */
     .contacts-scroll {
       flex: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       position: relative;
+      padding-bottom: 90px; /* Space for floating search pill */
     }
 
-    /* MY CARD */
-    .my-card {
-      display: flex;
-      align-items: center;
-      padding: 12px 16px;
-      gap: 14px;
-      background: #ffffff;
-      margin: 12px 16px 8px 16px;
-      border-radius: 12px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-    }
-
-    .my-card-avatar {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #8e8e93, #636366);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 600;
-    }
-
-    .my-card-info h3 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--ios-text);
-    }
-    .my-card-info p {
-      font-size: 13px;
-      color: var(--ios-text-secondary);
-      margin-top: 1px;
-    }
-
-    /* SECTION HEADERS */
+    /* SECTION HEADERS (H, I, etc.) */
     .section-header {
-      padding: 6px 16px;
+      padding: 6px 16px 4px 16px;
       font-size: 13px;
       font-weight: 600;
       color: var(--ios-text-secondary);
-      text-transform: uppercase;
-      background: var(--ios-bg);
+      background: #000000;
       position: sticky;
       top: 0;
       z-index: 5;
     }
 
     .contact-list-group {
-      background: #ffffff;
-      border-top: 0.5px solid var(--ios-separator);
-      border-bottom: 0.5px solid var(--ios-separator);
-      margin-bottom: 12px;
+      background: #000000;
     }
 
+    /* CONTACT ROW WITH AVATAR MONOGRAM */
     .contact-row {
-      padding: 11px 16px;
-      font-size: 17px;
-      line-height: 22px;
-      /* User requirement: "Dont bold the last name" -> uniform standard weight */
-      font-weight: 400;
-      color: var(--ios-text);
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      padding: 8px 16px;
       position: relative;
       cursor: pointer;
+      background: #000000;
     }
     .contact-row:active {
-      background-color: #e5e5ea;
+      background-color: var(--ios-row-active);
     }
-    .contact-row:not(:last-child)::after {
+
+    .row-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--ios-avatar-bg);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 500;
+      flex-shrink: 0;
+      margin-right: 14px;
+      border: 0.5px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .row-avatar svg {
+      width: 22px;
+      height: 22px;
+      fill: #ffffff;
+    }
+
+    .row-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      padding-bottom: 2px;
+    }
+
+    .row-name {
+      font-size: 17px;
+      font-weight: 400; /* User requirement: no bold last name */
+      color: #ffffff;
+      line-height: 22px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .row-subtitle {
+      font-size: 13px;
+      color: var(--ios-text-secondary);
+      margin-top: 1px;
+      line-height: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Subtle row divider indented after avatar */
+    .contact-row::after {
       content: "";
       position: absolute;
       bottom: 0;
-      left: 16px;
+      left: 70px;
       right: 0;
       height: 0.5px;
       background: var(--ios-separator);
     }
 
-    .contact-sub {
-      font-size: 13px;
-      color: var(--ios-text-secondary);
-      margin-top: 2px;
-      font-weight: 400;
-    }
-
     .highlight-digit {
       background: #ffeb3b;
-      color: #000;
+      color: #000000;
       font-weight: 600;
       padding: 0 2px;
       border-radius: 2px;
@@ -268,11 +243,11 @@
       position: fixed;
       right: 2px;
       top: 50%;
-      transform: translateY(-45%);
+      transform: translateY(-50%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
+      gap: 1.5px;
       z-index: 90;
       padding: 4px;
     }
@@ -282,225 +257,342 @@
       font-weight: 600;
       color: var(--ios-blue);
       line-height: 11px;
+      cursor: pointer;
+    }
+
+    /* FLOATING BOTTOM SEARCH DOCK (AS SEEN IN USER SCREENSHOT IMAGE 3) */
+    .bottom-search-dock {
+      position: fixed;
+      bottom: 20px;
+      left: 16px;
+      right: 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 95;
+    }
+
+    .floating-search-bar {
+      flex: 1;
+      height: 44px;
+      background: rgba(36, 34, 46, 0.94);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 22px;
+      border: 0.5px solid rgba(255, 255, 255, 0.14);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    .floating-search-bar svg {
+      width: 17px;
+      height: 17px;
+      fill: var(--ios-text-secondary);
+      flex-shrink: 0;
+    }
+
+    .floating-search-bar input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 17px;
+      font-family: var(--font-family);
+      width: 100%;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .floating-search-bar input::placeholder {
+      color: var(--ios-text-secondary);
+    }
+
+    .floating-plus-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(36, 34, 46, 0.94);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 0.5px solid rgba(255, 255, 255, 0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .floating-plus-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: #ffffff;
+      stroke-width: 2.2;
     }
 
     /* EMPTY STATE */
     .empty-state {
-      padding: 60px 24px;
+      padding: 80px 24px;
       text-align: center;
       color: var(--ios-text-secondary);
     }
     .empty-state svg {
-      width: 48px;
-      height: 48px;
+      width: 50px;
+      height: 50px;
       fill: var(--ios-text-tertiary);
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
     .empty-state h3 {
-      font-size: 19px;
+      font-size: 20px;
       font-weight: 600;
-      color: var(--ios-text);
-      margin-bottom: 6px;
+      color: #ffffff;
+      margin-bottom: 8px;
     }
     .empty-state p {
       font-size: 15px;
-      line-height: 20px;
+      line-height: 22px;
     }
 
-    /* TOTAL FOOTER */
     .total-footer {
       text-align: center;
-      padding: 16px 0 40px 0;
+      padding: 20px 0 40px 0;
       color: var(--ios-text-secondary);
       font-size: 14px;
-      font-weight: 400;
     }
 
-    /* CONTACT DETAIL VIEW */
+    /* ========================================================
+       DETAIL VIEW (DARK MODE - EXACT MATCH TO IMAGE 4 & 5)
+       ======================================================== */
     .detail-nav {
       padding-top: env(safe-area-inset-top, 44px);
-      height: calc(env(safe-area-inset-top, 44px) + 44px);
+      height: calc(env(safe-area-inset-top, 44px) + 50px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-left: 8px;
+      padding-left: 16px;
       padding-right: 16px;
-      background: rgba(242, 242, 247, 0.94);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 0.5px solid rgba(0,0,0,0.1);
       position: sticky;
       top: 0;
       z-index: 100;
     }
 
-    .back-btn {
+    .circle-nav-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: none;
       display: flex;
       align-items: center;
-      color: var(--ios-blue);
-      font-size: 17px;
-      background: none;
-      border: none;
+      justify-content: center;
       cursor: pointer;
-      padding: 8px;
-      gap: 3px;
     }
-    .back-btn svg {
+    .circle-nav-btn svg {
       width: 20px;
       height: 20px;
-      fill: var(--ios-blue);
+      fill: #ffffff;
+    }
+
+    .pill-edit-btn {
+      border-radius: 18px;
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: none;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
     }
 
     .detail-scroll {
       flex: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding-bottom: 40px;
+      padding-bottom: 60px;
     }
 
-    /* DETAIL HERO */
+    /* HERO SECTION */
     .detail-hero {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 16px 16px 12px 16px;
+      padding: 10px 16px 8px 16px;
     }
 
-    .detail-avatar {
-      width: 76px;
-      height: 76px;
+    /* GIANT CIRCULAR AVATAR WITH GLOW BORDER */
+    .detail-avatar-giant {
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #a1a1aa, #71717a);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 0 35px rgba(255, 255, 255, 0.05);
       color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      font-size: 58px;
+      font-weight: 400;
+      margin-top: 6px;
     }
 
-    .detail-name {
+    .detail-name-large {
       font-size: 24px;
-      font-weight: 600;
-      letter-spacing: -0.4px;
-      color: var(--ios-text);
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #ffffff;
       text-align: center;
+      margin-top: 14px;
     }
 
-    .detail-org {
+    .detail-subtitle {
       font-size: 14px;
-      color: var(--ios-text-secondary);
+      color: #9d9aa8;
+      text-align: center;
       margin-top: 2px;
+      font-weight: 400;
     }
 
-    /* ACTION PILLS (Message, Call, Video, Mail) */
-    .action-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      padding: 12px 16px 16px 16px;
-      max-width: 440px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .action-pill {
-      background: var(--ios-card-bg);
-      border-radius: 12px;
-      padding: 10px 4px 8px 4px;
+    /* 4 CIRCULAR ACTION BUTTONS */
+    .detail-action-circles {
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      gap: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-      cursor: pointer;
+      gap: 14px;
+      margin: 18px 0 20px 0;
     }
-    .action-pill:active {
+
+    .action-circle-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+    }
+    .action-circle-btn:active {
       opacity: 0.6;
     }
-    .action-pill svg {
-      width: 22px;
-      height: 22px;
-      fill: var(--ios-blue);
-    }
-    .action-pill span {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--ios-blue);
+    .action-circle-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #ffffff;
     }
 
-    /* DETAIL CARD GROUPS */
-    .card-group {
-      background: var(--ios-card-bg);
-      border-radius: 12px;
-      margin: 0 16px 16px 16px;
-      padding: 0 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    /* DETAIL CARDS (TRANSLUCENT DARK PURPLE-INDIGO) */
+    .detail-card {
+      background: rgba(43, 39, 61, 0.72);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 0.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      margin: 0 16px 10px 16px;
+      padding: 12px 16px;
     }
 
-    .card-item {
-      padding: 12px 0;
+    .card-label-small {
+      font-size: 13px;
+      color: #9d9aa8;
+      margin-bottom: 2px;
+      text-transform: lowercase;
+    }
+
+    .card-row-value {
       display: flex;
-      flex-direction: column;
-      gap: 3px;
-      position: relative;
-    }
-    .card-item:not(:last-child)::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 0.5px;
-      background: var(--ios-separator);
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .card-label {
-      font-size: 12px;
-      color: var(--ios-text-secondary);
-      text-transform: capitalize;
-    }
-
-    .card-value {
+    .card-val-text {
       font-size: 17px;
-      color: var(--ios-blue);
+      color: #ffffff;
       font-weight: 400;
       user-select: text;
       -webkit-user-select: text;
     }
-    .card-value.black {
-      color: var(--ios-text);
+
+    .card-side-icon svg {
+      width: 15px;
+      height: 15px;
+      fill: #9d9aa8;
     }
 
-    .notes-box {
+    .notes-content {
       font-size: 15px;
       line-height: 20px;
-      color: var(--ios-text);
+      color: #ffffff;
       white-space: pre-wrap;
+      min-height: 46px;
       user-select: text;
       -webkit-user-select: text;
     }
 
-    /* COVERT SETTINGS MODAL */
+    /* EXTRA AUTHENTIC ACTION ROWS */
+    .action-list-card {
+      background: rgba(43, 39, 61, 0.72);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 0.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      margin: 0 16px 10px 16px;
+      overflow: hidden;
+    }
+
+    .action-list-item {
+      padding: 12px 16px;
+      font-size: 16px;
+      color: #ffffff;
+      cursor: pointer;
+      position: relative;
+    }
+    .action-list-item:active {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .action-list-item:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 16px;
+      right: 0;
+      height: 0.5px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .action-list-item.danger {
+      color: #ff453a;
+    }
+
+    /* ========================================================
+       COVERT SETTINGS MODAL (DARK MODE)
+       ======================================================== */
     #settings-modal {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.45);
+      background: rgba(0, 0, 0, 0.65);
       z-index: 9999;
       display: none;
       align-items: flex-end;
       justify-content: center;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
     #settings-modal.active {
       display: flex;
     }
 
     .modal-sheet {
-      background: #f2f2f7;
+      background: #1c1c1e;
+      color: #ffffff;
       width: 100%;
       max-width: 480px;
       border-radius: 20px 20px 0 0;
@@ -508,8 +600,9 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 -4px 30px rgba(0,0,0,0.25);
+      box-shadow: 0 -4px 35px rgba(0,0,0,0.7);
       animation: sheetUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      border-top: 0.5px solid rgba(255, 255, 255, 0.15);
     }
 
     @keyframes sheetUp {
@@ -522,8 +615,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #ffffff;
-      border-bottom: 0.5px solid var(--ios-separator);
+      background: #252528;
+      border-bottom: 0.5px solid #3a3a3c;
     }
     .modal-header h2 {
       font-size: 17px;
@@ -545,16 +638,16 @@
     }
 
     .settings-section {
-      background: #ffffff;
+      background: #2c2c2e;
       border-radius: 12px;
       padding: 14px 16px;
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      border: 0.5px solid #3a3a3c;
     }
     .settings-section h4 {
       font-size: 12px;
       text-transform: uppercase;
-      color: var(--ios-text-secondary);
+      color: #8e8e93;
       margin-bottom: 10px;
       letter-spacing: 0.5px;
     }
@@ -570,28 +663,18 @@
     }
     .form-row label {
       font-size: 13px;
-      color: #636366;
+      color: #aeaeb2;
     }
     .form-row input, .form-row select, .form-row textarea {
       padding: 8px 10px;
       border-radius: 8px;
-      border: 1px solid #d1d1d6;
+      border: 1px solid #3a3a3c;
       font-size: 15px;
       font-family: var(--font-family);
-      background: #fafafa;
+      background: #1c1c1e;
+      color: #ffffff;
+      outline: none;
     }
-
-    .status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 4px;
-    }
-    .badge-armed { background: #fee2e2; color: #dc2626; }
-    .badge-done { background: #dcfce7; color: #16a34a; }
-    .badge-wait { background: #fef3c7; color: #d97706; }
 
     .btn-action {
       background: var(--ios-blue);
@@ -606,8 +689,8 @@
       margin-top: 8px;
     }
     .btn-secondary {
-      background: #e5e5ea;
-      color: #000;
+      background: #3a3a3c;
+      color: #ffffff;
       border: none;
       padding: 8px 12px;
       border-radius: 8px;
@@ -621,37 +704,22 @@
 </head>
 <body>
   <div id="app">
-    <!-- VIEW: CONTACT LIST -->
+    <!-- VIEW: CONTACT LIST (DARK MODE) -->
     <div id="view-list" class="screen">
-      <div class="nav-bar-large">
-        <div class="top-actions">
-          <button class="nav-btn" id="btn-lists">Lists</button>
-          <button class="nav-btn bold" id="btn-plus">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
+      <div class="list-header">
+        <div class="list-top-bar">
+          <button class="round-nav-btn" id="btn-back-lists">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </button>
-        </div>
-        <div class="large-title">Contacts</div>
-        <div class="search-wrapper">
-          <div class="search-box">
-            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-            <input type="text" id="search-input" placeholder="Search" autocomplete="off" autocorrect="off" spellcheck="false">
+          <div class="list-title-wrap">
+            <h2>iCloud</h2>
+            <p>Contacts</p>
           </div>
+          <div style="width: 32px;"></div> <!-- Spacer -->
         </div>
       </div>
 
       <div class="contacts-scroll" id="contacts-scroll">
-        <!-- MY CARD -->
-        <div class="my-card" id="my-card">
-          <div class="my-card-avatar" id="my-card-avatar">RD</div>
-          <div class="my-card-info">
-            <h3 id="my-card-name">Robert Dolan</h3>
-            <p>My Card</p>
-          </div>
-        </div>
-
         <!-- CONTACT SECTIONS CONTAINER -->
         <div id="contacts-container"></div>
 
@@ -661,76 +729,93 @@
 
       <!-- ALPHABET SCRUBBER -->
       <div class="alpha-scrubber" id="scrubber"></div>
+
+      <!-- FLOATING BOTTOM SEARCH DOCK (AS SEEN IN USER SCREENSHOT) -->
+      <div class="bottom-search-dock">
+        <div class="floating-search-bar">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" id="search-input" placeholder="Search" autocomplete="off" autocorrect="off" spellcheck="false">
+        </div>
+        <button class="floating-plus-btn" id="btn-plus">
+          <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+      </div>
     </div>
 
-    <!-- VIEW: CONTACT DETAIL -->
+    <!-- VIEW: CONTACT DETAIL (DARK MODE POSTER - EXACT MATCH TO IMAGE 4 & 5) -->
     <div id="view-detail" class="screen">
       <div class="detail-nav">
-        <button class="back-btn" id="btn-back">
+        <button class="circle-nav-btn" id="btn-back">
           <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-          <span>Contacts</span>
         </button>
-        <button class="nav-btn" style="font-weight: 500;">Edit</button>
+        <button class="pill-edit-btn">Edit</button>
       </div>
 
       <div class="detail-scroll">
-        <!-- HERO -->
+        <!-- HERO POSTER SECTION -->
         <div class="detail-hero">
-          <div class="detail-avatar" id="detail-avatar">--</div>
-          <div class="detail-name" id="detail-name">Contact Name</div>
-          <div class="detail-org" id="detail-org"></div>
+          <div class="detail-avatar-giant" id="detail-avatar">H</div>
+          <div class="detail-name-large" id="detail-name">Hugo</div>
+          <div class="detail-subtitle" id="detail-subtitle">Driver</div>
         </div>
 
-        <!-- 4 ACTION PILLS -->
-        <div class="action-grid">
-          <div class="action-pill">
-            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-            <span>message</span>
-          </div>
-          <div class="action-pill">
+        <!-- 4 ACTION CIRCLE BUTTONS (IMAGE 4) -->
+        <div class="detail-action-circles">
+          <button class="action-circle-btn">
+            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+          </button>
+          <button class="action-circle-btn">
             <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-            <span>call</span>
-          </div>
-          <div class="action-pill">
+          </button>
+          <button class="action-circle-btn">
             <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-            <span>video</span>
-          </div>
-          <div class="action-pill">
+          </button>
+          <button class="action-circle-btn" id="btn-circle-mail">
             <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-            <span>mail</span>
-          </div>
+          </button>
         </div>
 
-        <!-- PHONE CARD -->
-        <div class="card-group" id="card-phone-group">
-          <div class="card-item">
-            <span class="card-label">mobile</span>
-            <span class="card-value" id="detail-phone">(555) 000-0000</span>
+        <!-- PHONE CARD (IMAGE 4) -->
+        <div class="detail-card" id="card-phone-group">
+          <div class="card-label-small" id="detail-phone-label">phone</div>
+          <div class="card-row-value">
+            <div class="card-val-text" id="detail-phone">+1 (917) 929-2266</div>
+            <div class="card-side-icon">
+              <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            </div>
           </div>
         </div>
 
         <!-- BIRTHDAY CARD -->
-        <div class="card-group" id="card-birthday-group" style="display: none;">
-          <div class="card-item">
-            <span class="card-label">birthday</span>
-            <span class="card-value black" id="detail-birthday">October 14</span>
+        <div class="detail-card" id="card-birthday-group" style="display: none;">
+          <div class="card-label-small">birthday</div>
+          <div class="card-row-value">
+            <div class="card-val-text" id="detail-birthday">May 4, 1999</div>
           </div>
         </div>
 
-        <!-- EMAIL CARD -->
-        <div class="card-group" id="card-email-group" style="display: none;">
-          <div class="card-item">
-            <span class="card-label">home</span>
-            <span class="card-value" id="detail-email">email@address.com</span>
-          </div>
+        <!-- NOTES CARD (IMAGE 4 & 5) -->
+        <div class="detail-card" id="card-notes-group">
+          <div class="card-label-small">Notes</div>
+          <div class="notes-content" id="detail-notes"></div>
         </div>
 
-        <!-- NOTES CARD -->
-        <div class="card-group" id="card-notes-group" style="display: none;">
-          <div class="card-item">
-            <span class="card-label">Notes</span>
-            <div class="notes-box" id="detail-notes"></div>
-          </div>
+        <!-- EXTRA AUTHENTIC ACTION CARDS (IMAGE 4 & 5) -->
+        <div class="action-list-card">
+          <div class="action-list-item">Share Contact</div>
+          <div class="action-list-item">Add to Favorites</div>
+        </div>
+
+        <div class="action-list-card">
+          <div class="action-list-item">Add to List</div>
+        </div>
+
+        <div class="action-list-card">
+          <div class="action-list-item">Add to Emergency Contacts</div>
+        </div>
+
+        <div class="action-list-card">
+          <div class="action-list-item danger">Block Contact</div>
         </div>
       </div>
     </div>
@@ -786,16 +871,16 @@
             </div>
           </div>
 
-          <!-- PHASE 2 TARGET DETAILS -->
+          <!-- PHASE 2 TARGET DETAILS (UBER DRIVER FROM A YEAR AGO) -->
           <div class="settings-section">
             <h4>Phase 2 Forced Details (Next Contact Opened)</h4>
             <div class="form-row">
               <label>Forced Phone Number:</label>
-              <input type="text" id="cfg-p2-phone" value="(917) 929-2266">
+              <input type="text" id="cfg-p2-phone" value="+1 (917) 929-2266">
             </div>
             <div class="form-row">
-              <label>Company / Organization:</label>
-              <input type="text" id="cfg-p2-org" value="Uber">
+              <label>Subtitle / Role:</label>
+              <input type="text" id="cfg-p2-org" value="Driver">
             </div>
             <div class="form-row">
               <label>Forced Notes:</label>
@@ -807,19 +892,19 @@
           <div class="settings-section">
             <h4>Phase 3 (3-Digit Force Number)</h4>
             <div class="form-row">
-              <label>Prefix / Area Code Pattern:</label>
-              <input type="text" id="cfg-p3-pattern" value="(212) {XXX}-4912">
+              <label>Prefix / Pattern:</label>
+              <input type="text" id="cfg-p3-pattern" value="(914) {XXX}-2342">
             </div>
           </div>
 
           <!-- IMPORT USER CONTACTS (.VCF) -->
           <div class="settings-section">
             <h4>Contact Directory (.vcf Import)</h4>
-            <p style="font-size: 13px; color: #636366; margin-bottom: 8px;">
+            <p style="font-size: 13px; color: #8e8e93; margin-bottom: 8px;">
               Only genuine contacts you import will appear in the app. No synthetic/fake contacts are added.
             </p>
             <input type="file" id="file-vcf" accept=".vcf,text/vcard" style="font-size: 13px; margin-bottom: 8px;">
-            <button class="btn-secondary" id="btn-clear-contacts" style="color: #dc2626;">Wipe All Imported Contacts</button>
+            <button class="btn-secondary" id="btn-clear-contacts" style="color: #ff453a;">Wipe All Imported Contacts</button>
           </div>
         </div>
       </div>
@@ -827,12 +912,12 @@
   </div>
 
   <script>
-    /* HYPERMNESIA ENGINE - IN-CARD DETAIL FORCING */
+    /* HYPERMNESIA ENGINE - DARK MODE & IN-CARD FORCING */
 
     const SETTINGS_PIN = "2769";
     const STORAGE_KEY_CONTACTS = "hypermnesia_real_contacts_v1";
-    const STORAGE_KEY_OVERRIDES = "hypermnesia_overrides_v3";
-    const STORAGE_KEY_CONFIG = "hypermnesia_config_v3";
+    const STORAGE_KEY_OVERRIDES = "hypermnesia_overrides_v4";
+    const STORAGE_KEY_CONFIG = "hypermnesia_config_v4";
 
     // DEFAULT CONFIG
     let config = {
@@ -840,16 +925,16 @@
       threshold: 3,
       p1Phone: "(914) 393-2342",
       p1Bday: "May 4, 1999",
-      p2Phone: "(917) 929-2266",
-      p2Org: "Uber",
+      p2Phone: "+1 (917) 929-2266",
+      p2Org: "Driver",
       p2Notes: "Uber driver from last year (Nov 2025) • White Toyota Camry • Left jacket in backseat",
       p3Pattern: "(914) {XXX}-2342"
     };
 
     // ACTIVE RUNTIME STATE
     let contacts = [];
-    let contactOverrides = {}; // id -> { phone, bday, notes, email, org }
-    let currentPhase = 1; // 1 = waiting for P1 contact, 1.5 = P1 done, counting/waiting for scroll, 2 = armed for P2, 2.5 = P2 done, 3 = search force
+    let contactOverrides = {};
+    let currentPhase = 1;
     let interveningCount = 0;
     let phase1ContactId = null;
     let phase2ContactId = null;
@@ -909,6 +994,8 @@
             bday = rawLine.substring(rawLine.indexOf(":") + 1).trim();
           } else if (rawLine.startsWith("ORG:") || rawLine.startsWith("ORG;")) {
             org = rawLine.substring(rawLine.indexOf(":") + 1).trim().replace(/;/g, " ");
+          } else if (rawLine.startsWith("TITLE:") || rawLine.startsWith("TITLE;")) {
+            if (!org) org = rawLine.substring(rawLine.indexOf(":") + 1).trim();
           } else if (rawLine.startsWith("NOTE:") || rawLine.startsWith("NOTE;")) {
             notes = rawLine.substring(rawLine.indexOf(":") + 1).trim().replace(/\\n/g, "\n");
           }
@@ -927,9 +1014,22 @@
         }
       }
 
-      // Sort alphabetically by name
       parsed.sort((a, b) => a.name.localeCompare(b.name));
       return parsed;
+    }
+
+    // GET MONOGRAM INITIALS
+    function getInitials(name) {
+      if (!name) return "?";
+      // If email
+      if (name.includes("@")) {
+        return `<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
+      }
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) {
+        return parts[0][0].toUpperCase();
+      }
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 
     // RENDER CONTACT LIST
@@ -940,14 +1040,12 @@
       const query = filterQuery.trim().toLowerCase();
       let filtered = contacts;
 
-      // PHASE 3 CHECK: If query is 3 digits (e.g., "834")
+      // 3-digit search force
       const isThreeDigitSearch = /^\d{3}$/.test(query);
 
       if (isThreeDigitSearch) {
-        // In Phase 3, 3 digits match our force target (or Phase 1 contact)
         const targetContact = contacts.find(c => c.id === phase1ContactId) || contacts[0];
         if (targetContact) {
-          // Dynamic force phone containing the 3 digits
           const dynamicPhone = config.p3Pattern.replace("{XXX}", query);
           contactOverrides[targetContact.id] = {
             ...(contactOverrides[targetContact.id] || {}),
@@ -955,7 +1053,6 @@
           };
           saveState();
 
-          // Render only this contact with highlight
           renderSectionGroup(container, "Top Name Match", [targetContact], query);
           document.getElementById("total-footer").textContent = "1 Contact Found";
           return;
@@ -981,7 +1078,7 @@
             <div class="empty-state">
               <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
               <h3>No Contacts</h3>
-              <p>Type <strong>2769</strong> in the search bar above to import your .vcf contacts file.</p>
+              <p>Type <strong>2769</strong> in the search bar below to import your .vcf contacts file.</p>
             </div>
           `;
           document.getElementById("total-footer").textContent = "0 Contacts";
@@ -997,7 +1094,6 @@
         return;
       }
 
-      // Group by first letter
       const groups = {};
       for (const c of filtered) {
         let firstLetter = (c.name.trim()[0] || "#").toUpperCase();
@@ -1032,26 +1128,29 @@
       for (const c of list) {
         const row = document.createElement("div");
         row.className = "contact-row";
-        
-        // USER REQUIREMENT: "Dont bold the last name" -> Uniform normal text
-        let displayName = escapeHtml(c.name);
+
+        const override = contactOverrides[c.id] || {};
+        const effectiveSubtitle = override.org || c.org || "";
+        const effectivePhone = override.phone || c.phone;
+        const initials = getInitials(c.name);
 
         let subHtml = "";
-        const override = contactOverrides[c.id] || {};
-        const effectivePhone = override.phone || c.phone;
-
-        // In search mode, show phone sub-line
         if (query) {
           let phoneDisplay = escapeHtml(effectivePhone);
           if (/^\d{3}$/.test(query)) {
             phoneDisplay = phoneDisplay.replace(new RegExp(`(${query})`, "g"), '<span class="highlight-digit">$1</span>');
           }
-          subHtml = `<div class="contact-sub">${phoneDisplay}</div>`;
+          subHtml = `<div class="row-subtitle">${phoneDisplay}</div>`;
+        } else if (effectiveSubtitle) {
+          subHtml = `<div class="row-subtitle">${escapeHtml(effectiveSubtitle)}</div>`;
         }
 
         row.innerHTML = `
-          <div>${displayName}</div>
-          ${subHtml}
+          <div class="row-avatar">${initials}</div>
+          <div class="row-content">
+            <div class="row-name">${escapeHtml(c.name)}</div>
+            ${subHtml}
+          </div>
         `;
 
         row.addEventListener("click", () => openContactDetail(c));
@@ -1071,7 +1170,7 @@
       }[m]));
     }
 
-    // RENDER ALPHABET SCRUBBER
+    // ALPHABET SCRUBBER
     function renderAlphabetScrubber() {
       const scrubber = document.getElementById("scrubber");
       scrubber.innerHTML = "";
@@ -1091,74 +1190,76 @@
       }
     }
 
-    // OPEN CONTACT DETAIL & APPLY IN-CARD FORCES
+    // OPEN DETAIL VIEW & INJECT TARGET DETAILS
     function openContactDetail(c) {
       activeDetailContact = c;
 
-      // INITIALIZE OVERRIDES IF NOT PRESENT
       if (!contactOverrides[c.id]) {
         contactOverrides[c.id] = {};
       }
 
-      // PHASE ENGINE LOGIC:
+      // PHASE ENGINE
       if (currentPhase === 1) {
-        // PHASE 1: Spectator taps ANY contact in the list.
-        // Force Phase 1 details inside this contact!
         contactOverrides[c.id].phone = config.p1Phone;
         contactOverrides[c.id].birthday = config.p1Bday;
         phase1ContactId = c.id;
 
-        // Advance to Phase 1.5 (waiting for trigger)
         currentPhase = 1.5;
         interveningCount = 0;
         updateStatusLabels();
         saveState();
 
       } else if (currentPhase === 1.5) {
-        // User opened an intervening contact
         if (c.id !== phase1ContactId) {
           interveningCount++;
           updateStatusLabels();
 
-          // Check count trigger
           if ((config.triggerMode === "both" || config.triggerMode === "count") && interveningCount >= config.threshold) {
-            // Armed for Phase 2!
             currentPhase = 2;
             updateStatusLabels();
           }
         }
 
       } else if (currentPhase === 2) {
-        // PHASE 2 ARMED: The very next contact opened gets Phase 2 details injected!
         if (c.id !== phase1ContactId) {
           contactOverrides[c.id].phone = config.p2Phone;
           contactOverrides[c.id].notes = config.p2Notes;
           if (config.p2Org) contactOverrides[c.id].org = config.p2Org;
           phase2ContactId = c.id;
 
-          currentPhase = 2.5; // Phase 2 complete
+          currentPhase = 2.5;
           updateStatusLabels();
           saveState();
         }
       }
 
-      // Populate Detail View using (Overrides || Original contact data)
       const ov = contactOverrides[c.id] || {};
       const finalName = c.name;
       const finalPhone = ov.phone || c.phone || "(555) 019-2831";
       const finalBirthday = ov.birthday || c.birthday || "";
       const finalEmail = ov.email || c.email || "";
       const finalNotes = ov.notes || c.notes || "";
-      const finalOrg = ov.org || c.org || "";
+      const finalSubtitle = ov.org || c.org || "";
 
-      // Initials for avatar
-      const parts = finalName.trim().split(/\s+/);
-      let initials = parts[0] ? parts[0][0].toUpperCase() : "?";
-      if (parts.length > 1) initials += parts[parts.length - 1][0].toUpperCase();
+      // Large avatar monogram
+      const rawInitials = getInitials(finalName);
+      const avatarEl = document.getElementById("detail-avatar");
+      if (typeof rawInitials === "string" && rawInitials.startsWith("<svg")) {
+        avatarEl.innerHTML = rawInitials;
+      } else {
+        avatarEl.textContent = (finalName.trim()[0] || "?").toUpperCase();
+      }
 
-      document.getElementById("detail-avatar").textContent = initials;
       document.getElementById("detail-name").textContent = finalName;
-      document.getElementById("detail-org").textContent = finalOrg;
+      
+      const subEl = document.getElementById("detail-subtitle");
+      if (finalSubtitle) {
+        subEl.textContent = finalSubtitle;
+        subEl.style.display = "block";
+      } else {
+        subEl.style.display = "none";
+      }
+
       document.getElementById("detail-phone").textContent = finalPhone;
 
       // Birthday card
@@ -1170,30 +1271,20 @@
         bdayGroup.style.display = "none";
       }
 
-      // Email card
-      const emailGroup = document.getElementById("card-email-group");
-      if (finalEmail) {
-        document.getElementById("detail-email").textContent = finalEmail;
-        emailGroup.style.display = "block";
-      } else {
-        emailGroup.style.display = "none";
-      }
-
       // Notes card
-      const notesGroup = document.getElementById("card-notes-group");
-      if (finalNotes) {
-        document.getElementById("detail-notes").textContent = finalNotes;
-        notesGroup.style.display = "block";
-      } else {
-        notesGroup.style.display = "none";
-      }
+      const notesEl = document.getElementById("detail-notes");
+      notesEl.textContent = finalNotes;
 
-      // Slide in detail view
+      // Mail button dim if no email
+      const mailBtn = document.getElementById("btn-circle-mail");
+      mailBtn.style.opacity = finalEmail ? "1" : "0.38";
+
+      // Slide in
       document.getElementById("view-list").classList.add("slide-left");
       document.getElementById("view-detail").classList.add("slide-in");
     }
 
-    // CLOSE CONTACT DETAIL (BACK TO LIST)
+    // CLOSE DETAIL VIEW
     function closeContactDetail() {
       document.getElementById("view-detail").classList.remove("slide-in");
       document.getElementById("view-list").classList.remove("slide-left");
@@ -1201,13 +1292,11 @@
       renderContactList(document.getElementById("search-input").value);
     }
 
-    // SCROLL LISTENER FOR PHASE 2 TRIGGER
+    // SCROLL LISTENER FOR PHASE 2 ARMING
     const scrollContainer = document.getElementById("contacts-scroll");
     scrollContainer.addEventListener("scroll", () => {
-      // If in Phase 1.5 and user scrolls back to the very top (scrollTop <= 15)
       if (currentPhase === 1.5 && (config.triggerMode === "both" || config.triggerMode === "scroll")) {
         if (scrollContainer.scrollTop <= 15) {
-          // Armed for Phase 2!
           currentPhase = 2;
           updateStatusLabels();
           console.log("Hypermnesia: Phase 2 armed via scroll-to-top trigger!");
@@ -1220,7 +1309,6 @@
     searchInput.addEventListener("input", (e) => {
       const val = e.target.value.trim();
 
-      // Check for PIN to open covert settings
       if (val === SETTINGS_PIN) {
         e.target.value = "";
         openSettingsModal();
@@ -1230,7 +1318,7 @@
       renderContactList(val);
     });
 
-    // COVERT SETTINGS MODAL
+    // COVERT SETTINGS
     function openSettingsModal() {
       updateStatusLabels();
       document.getElementById("cfg-trigger-mode").value = config.triggerMode;
@@ -1238,7 +1326,7 @@
       document.getElementById("cfg-p1-phone").value = config.p1Phone;
       document.getElementById("cfg-p1-bday").value = config.p1Bday;
       document.getElementById("cfg-p2-phone").value = config.p2Phone;
-      document.getElementById("cfg-p2-org").value = config.p2Org || "Uber";
+      document.getElementById("cfg-p2-org").value = config.p2Org || "Driver";
       document.getElementById("cfg-p2-notes").value = config.p2Notes;
       document.getElementById("cfg-p3-pattern").value = config.p3Pattern;
 
@@ -1279,7 +1367,7 @@
       document.getElementById("lbl-status-forced").textContent = Object.keys(contactOverrides).length;
     }
 
-    // BUTTON EVENT HANDLERS
+    // BUTTON LISTENERS
     document.getElementById("btn-back").addEventListener("click", closeContactDetail);
     document.getElementById("btn-close-modal").addEventListener("click", closeSettingsModal);
 
@@ -1301,7 +1389,6 @@
       alert("Routine reset! Contact details restored and Phase 1 is waiting.");
     });
 
-    // CLEAR CONTACTS
     document.getElementById("btn-clear-contacts").addEventListener("click", () => {
       if (confirm("Are you sure you want to wipe all imported contacts?")) {
         contacts = [];
@@ -1312,7 +1399,6 @@
       }
     });
 
-    // FILE IMPORTER FOR .VCF
     document.getElementById("file-vcf").addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
