@@ -7,1308 +7,1327 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Contacts">
-  <meta name="theme-color" content="#000000">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon.svg">
+  <meta name="theme-color" content="#f2f2f7">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="manifest" href="/manifest.json">
   <style>
     :root {
-      --bg: #000000;
-      --card-bg: #1c1c1e;
-      --secondary-bg: #2c2c2e;
-      --grouped-bg: #1c1c1e;
-      --separator: rgba(255, 255, 255, 0.15);
-      --text: #ffffff;
-      --text-muted: #8e8e93;
-      --accent: #0a84ff;
-      --green: #30d158;
-      --red: #ff453a;
-      --search-bg: rgba(255, 255, 255, 0.12);
-      --header-bg: rgba(0, 0, 0, 0.85);
-      --avatar-bg: #5e5e62;
-    }
-
-    @media (prefers-color-scheme: light) {
-      :root.theme-auto {
-        --bg: #ffffff;
-        --card-bg: #ffffff;
-        --secondary-bg: #f2f2f7;
-        --grouped-bg: #ffffff;
-        --separator: rgba(60, 60, 67, 0.2);
-        --text: #000000;
-        --text-muted: #8e8e93;
-        --accent: #007aff;
-        --green: #34c759;
-        --red: #ff3b30;
-        --search-bg: rgba(142, 142, 147, 0.16);
-        --header-bg: rgba(255, 255, 255, 0.85);
-        --avatar-bg: #d1d1d6;
-      }
-    }
-
-    body.theme-light {
-      --bg: #ffffff;
-      --card-bg: #ffffff;
-      --secondary-bg: #f2f2f7;
-      --grouped-bg: #ffffff;
-      --separator: rgba(60, 60, 67, 0.2);
-      --text: #000000;
-      --text-muted: #8e8e93;
-      --accent: #007aff;
-      --green: #34c759;
-      --red: #ff3b30;
-      --search-bg: rgba(142, 142, 147, 0.16);
-      --header-bg: rgba(255, 255, 255, 0.85);
-      --avatar-bg: #d1d1d6;
-    }
-
-    body.theme-dark {
-      --bg: #000000;
-      --card-bg: #1c1c1e;
-      --secondary-bg: #2c2c2e;
-      --grouped-bg: #1c1c1e;
-      --separator: rgba(255, 255, 255, 0.15);
-      --text: #ffffff;
-      --text-muted: #8e8e93;
-      --accent: #0a84ff;
-      --green: #30d158;
-      --red: #ff453a;
-      --search-bg: rgba(255, 255, 255, 0.12);
-      --header-bg: rgba(0, 0, 0, 0.85);
-      --avatar-bg: #5e5e62;
+      --ios-blue: #007aff;
+      --ios-bg: #f2f2f7;
+      --ios-card-bg: #ffffff;
+      --ios-text: #000000;
+      --ios-text-secondary: #8e8e93;
+      --ios-text-tertiary: #c7c7cc;
+      --ios-separator: #c6c6c8;
+      --ios-search-bg: #e3e3e8;
+      --ios-pill-bg: #ffffff;
+      --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       -webkit-user-select: none;
     }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
-      overflow: hidden;
+    body {
+      font-family: var(--font-family);
+      background-color: var(--ios-bg);
+      color: var(--ios-text);
+      overflow-x: hidden;
+      height: 100vh;
+      width: 100vw;
       position: fixed;
     }
 
-    /* Container */
+    /* APP CONTAINER */
     #app {
       width: 100%;
       height: 100%;
-      display: flex;
-      flex-direction: column;
       position: relative;
+      overflow: hidden;
     }
 
-    /* Top Nav Bar */
-    .nav-bar {
-      height: 48px;
-      padding-top: env(safe-area-inset-top, 0px);
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--ios-bg);
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-left: 16px;
-      padding-right: 16px;
-      background: var(--header-bg);
+      flex-direction: column;
+      transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+      overflow: hidden;
+    }
+
+    #view-list {
+      z-index: 10;
+      transform: translateX(0);
+    }
+    #view-list.slide-left {
+      transform: translateX(-28%);
+    }
+
+    #view-detail {
+      z-index: 20;
+      transform: translateX(100%);
+      box-shadow: -4px 0 20px rgba(0,0,0,0.12);
+    }
+    #view-detail.slide-in {
+      transform: translateX(0);
+    }
+
+    /* CONTACT LIST VIEW */
+    .nav-bar-large {
+      padding-top: env(safe-area-inset-top, 44px);
+      background: rgba(242, 242, 247, 0.88);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-bottom: 0.5px solid var(--separator);
-      z-index: 10;
-      flex-shrink: 0;
+      border-bottom: 0.5px solid rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .nav-left, .nav-right {
+
+    .top-actions {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      min-width: 60px;
+      padding: 6px 16px 2px 16px;
     }
-    .nav-right { justify-content: flex-end; }
+
     .nav-btn {
+      color: var(--ios-blue);
+      font-size: 17px;
+      font-weight: 400;
       background: none;
       border: none;
-      color: var(--accent);
-      font-size: 17px;
-      padding: 0;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 4px;
     }
-    .nav-btn svg {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2.2;
-    }
-    .nav-title {
-      font-size: 17px;
+
+    .nav-btn.bold {
       font-weight: 600;
-      letter-spacing: -0.2px;
     }
 
-    /* Large Title Header */
-    .large-header {
-      padding: 10px 16px 6px 16px;
-      flex-shrink: 0;
-    }
     .large-title {
       font-size: 34px;
       font-weight: 700;
-      letter-spacing: 0.35px;
-      margin: 0 0 10px 0;
+      letter-spacing: -0.6px;
+      padding: 0 16px 8px 16px;
     }
 
-    /* Native iOS Search Bar */
-    .search-wrap {
-      position: relative;
-      margin: 0 16px 10px 16px;
-      flex-shrink: 0;
+    .search-wrapper {
+      padding: 0 16px 10px 16px;
     }
+
     .search-box {
-      width: 100%;
-      height: 36px;
-      background: var(--search-bg);
+      background: var(--ios-search-bg);
       border-radius: 10px;
-      border: none;
-      outline: none;
-      padding: 0 34px 0 34px;
-      font-size: 17px;
-      color: var(--text);
-      font-family: inherit;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 6px;
     }
-    .search-box::placeholder {
-      color: var(--text-muted);
-    }
-    .search-icon {
-      position: absolute;
-      left: 9px;
-      top: 50%;
-      transform: translateY(-50%);
+
+    .search-box svg {
       width: 17px;
       height: 17px;
-      fill: var(--text-muted);
-      pointer-events: none;
-    }
-    .mic-icon {
-      position: absolute;
-      right: 9px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 16px;
-      height: 16px;
-      fill: var(--text-muted);
-      cursor: pointer;
+      fill: var(--ios-text-secondary);
+      flex-shrink: 0;
     }
 
-    /* Main Scrollable Contacts List */
-    .contact-list-container {
+    .search-box input {
+      border: none;
+      background: transparent;
+      font-size: 17px;
+      width: 100%;
+      outline: none;
+      font-family: var(--font-family);
+      color: var(--ios-text);
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .search-box input::placeholder {
+      color: var(--ios-text-secondary);
+    }
+
+    /* SCROLLABLE CONTACTS */
+    .contacts-scroll {
       flex: 1;
-      overflow-y: scroll;
+      overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       position: relative;
-      padding-bottom: max(34px, env(safe-area-inset-bottom, 34px));
     }
 
-    /* My Card */
+    /* MY CARD */
     .my-card {
       display: flex;
       align-items: center;
-      gap: 14px;
       padding: 12px 16px;
-      border-bottom: 0.5px solid var(--separator);
-      cursor: pointer;
+      gap: 14px;
+      background: #ffffff;
+      margin: 12px 16px 8px 16px;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
     }
+
     .my-card-avatar {
-      width: 58px;
-      height: 58px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
-      background: var(--avatar-bg);
-      color: #fff;
+      background: linear-gradient(135deg, #8e8e93, #636366);
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
-      font-weight: 600;
-      flex-shrink: 0;
-    }
-    .my-card-info {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .my-card-name {
       font-size: 20px;
       font-weight: 600;
     }
-    .my-card-sub {
+
+    .my-card-info h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ios-text);
+    }
+    .my-card-info p {
       font-size: 13px;
-      color: var(--text-muted);
+      color: var(--ios-text-secondary);
+      margin-top: 1px;
     }
 
-    /* Alphabet Section Headers */
+    /* SECTION HEADERS */
     .section-header {
       padding: 6px 16px;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-muted);
-      background: var(--bg);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ios-text-secondary);
+      text-transform: uppercase;
+      background: var(--ios-bg);
       position: sticky;
       top: 0;
       z-index: 5;
     }
 
-    /* Contact Row */
-    .contact-row {
-      padding: 12px 16px;
-      font-size: 17px;
-      font-weight: 400;
-      letter-spacing: -0.2px;
-      border-bottom: 0.5px solid var(--separator);
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .contact-row:active {
-      background: var(--search-bg);
-    }
-    .contact-row .c-name {
-      color: var(--text);
-    }
-    .contact-row .c-name strong {
-      font-weight: 600;
-    }
-    .contact-row .search-match-phone {
-      font-size: 14px;
-      color: var(--text-muted);
-      font-family: ui-monospace, monospace;
-    }
-    .contact-row .search-highlight {
-      color: #ffd60a;
-      font-weight: 700;
-      background: rgba(255, 214, 10, 0.18);
-      padding: 1px 3px;
-      border-radius: 3px;
+    .contact-list-group {
+      background: #ffffff;
+      border-top: 0.5px solid var(--ios-separator);
+      border-bottom: 0.5px solid var(--ios-separator);
+      margin-bottom: 12px;
     }
 
-    /* Right A-Z Scrubber */
-    .az-scrubber {
+    .contact-row {
+      padding: 11px 16px;
+      font-size: 17px;
+      line-height: 22px;
+      /* User requirement: "Dont bold the last name" -> uniform standard weight */
+      font-weight: 400;
+      color: var(--ios-text);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      cursor: pointer;
+    }
+    .contact-row:active {
+      background-color: #e5e5ea;
+    }
+    .contact-row:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 16px;
+      right: 0;
+      height: 0.5px;
+      background: var(--ios-separator);
+    }
+
+    .contact-sub {
+      font-size: 13px;
+      color: var(--ios-text-secondary);
+      margin-top: 2px;
+      font-weight: 400;
+    }
+
+    .highlight-digit {
+      background: #ffeb3b;
+      color: #000;
+      font-weight: 600;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    /* ALPHABET SCRUBBER */
+    .alpha-scrubber {
       position: fixed;
       right: 2px;
       top: 50%;
-      transform: translateY(-50%);
+      transform: translateY(-45%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      z-index: 20;
-      padding: 8px 4px;
-      touch-action: none;
+      gap: 2px;
+      z-index: 90;
+      padding: 4px;
     }
-    .az-letter {
+
+    .alpha-scrubber span {
       font-size: 11px;
       font-weight: 600;
-      color: var(--accent);
-      padding: 1.5px 4px;
-      line-height: 1;
+      color: var(--ios-blue);
+      line-height: 11px;
     }
 
-    /* Detail View Sheet */
-    .detail-view {
-      position: absolute;
-      inset: 0;
-      background: var(--bg);
-      z-index: 50;
+    /* EMPTY STATE */
+    .empty-state {
+      padding: 60px 24px;
+      text-align: center;
+      color: var(--ios-text-secondary);
+    }
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      fill: var(--ios-text-tertiary);
+      margin-bottom: 14px;
+    }
+    .empty-state h3 {
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--ios-text);
+      margin-bottom: 6px;
+    }
+    .empty-state p {
+      font-size: 15px;
+      line-height: 20px;
+    }
+
+    /* TOTAL FOOTER */
+    .total-footer {
+      text-align: center;
+      padding: 16px 0 40px 0;
+      color: var(--ios-text-secondary);
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    /* CONTACT DETAIL VIEW */
+    .detail-nav {
+      padding-top: env(safe-area-inset-top, 44px);
+      height: calc(env(safe-area-inset-top, 44px) + 44px);
       display: flex;
-      flex-direction: column;
-      transform: translateX(100%);
-      transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
-      overflow-y: scroll;
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: max(40px, env(safe-area-inset-bottom, 40px));
-    }
-    .detail-view.open {
-      transform: translateX(0%);
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 8px;
+      padding-right: 16px;
+      background: rgba(242, 242, 247, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 0.5px solid rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .detail-header {
-      padding: 24px 16px 16px 16px;
+    .back-btn {
+      display: flex;
+      align-items: center;
+      color: var(--ios-blue);
+      font-size: 17px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      gap: 3px;
+    }
+    .back-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--ios-blue);
+    }
+
+    .detail-scroll {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 40px;
+    }
+
+    /* DETAIL HERO */
+    .detail-hero {
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-align: center;
+      padding: 16px 16px 12px 16px;
     }
+
     .detail-avatar {
-      width: 88px;
-      height: 88px;
+      width: 76px;
+      height: 76px;
       border-radius: 50%;
-      background: var(--avatar-bg);
-      color: #fff;
+      background: linear-gradient(135deg, #a1a1aa, #71717a);
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 34px;
+      font-size: 32px;
       font-weight: 600;
       margin-bottom: 12px;
-    }
-    .detail-name {
-      font-size: 26px;
-      font-weight: 700;
-      margin-bottom: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
 
-    /* Native Action Pills */
-    .action-row {
+    .detail-name {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.4px;
+      color: var(--ios-text);
+      text-align: center;
+    }
+
+    .detail-org {
+      font-size: 14px;
+      color: var(--ios-text-secondary);
+      margin-top: 2px;
+    }
+
+    /* ACTION PILLS (Message, Call, Video, Mail) */
+    .action-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 8px;
+      padding: 12px 16px 16px 16px;
+      max-width: 440px;
+      margin: 0 auto;
       width: 100%;
-      max-width: 340px;
-      margin-bottom: 24px;
     }
+
     .action-pill {
-      background: var(--card-bg);
+      background: var(--ios-card-bg);
       border-radius: 12px;
-      padding: 10px 4px;
+      padding: 10px 4px 8px 4px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      color: var(--accent);
+      gap: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
       cursor: pointer;
+    }
+    .action-pill:active {
+      opacity: 0.6;
     }
     .action-pill svg {
       width: 22px;
       height: 22px;
-      fill: currentColor;
+      fill: var(--ios-blue);
     }
     .action-pill span {
       font-size: 11px;
       font-weight: 500;
+      color: var(--ios-blue);
     }
 
-    /* Information Groups */
-    .info-group {
-      background: var(--card-bg);
+    /* DETAIL CARD GROUPS */
+    .card-group {
+      background: var(--ios-card-bg);
       border-radius: 12px;
       margin: 0 16px 16px 16px;
-      overflow: hidden;
+      padding: 0 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
-    .info-row {
-      padding: 14px 16px;
-      border-bottom: 0.5px solid var(--separator);
+
+    .card-item {
+      padding: 12px 0;
       display: flex;
       flex-direction: column;
       gap: 3px;
+      position: relative;
     }
-    .info-row:last-child {
-      border-bottom: none;
-    }
-    .info-label {
-      font-size: 12px;
-      color: var(--text-muted);
-      text-transform: capitalize;
-    }
-    .info-value {
-      font-size: 17px;
-      color: var(--accent);
-      word-break: break-word;
-    }
-    .info-value.plain {
-      color: var(--text);
-    }
-    .info-value.note-val {
-      color: var(--text);
-      font-size: 15px;
-      line-height: 1.4;
-      white-space: pre-line;
+    .card-item:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 0.5px;
+      background: var(--ios-separator);
     }
 
-    /* Settings Modal Sheet (Covert PIN 2769) */
-    .settings-modal {
+    .card-label {
+      font-size: 12px;
+      color: var(--ios-text-secondary);
+      text-transform: capitalize;
+    }
+
+    .card-value {
+      font-size: 17px;
+      color: var(--ios-blue);
+      font-weight: 400;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .card-value.black {
+      color: var(--ios-text);
+    }
+
+    .notes-box {
+      font-size: 15px;
+      line-height: 20px;
+      color: var(--ios-text);
+      white-space: pre-wrap;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    /* COVERT SETTINGS MODAL */
+    #settings-modal {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 100;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 9999;
       display: none;
       align-items: flex-end;
       justify-content: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
-    .settings-modal.open {
+    #settings-modal.active {
       display: flex;
     }
-    .settings-sheet {
+
+    .modal-sheet {
+      background: #f2f2f7;
       width: 100%;
-      max-width: 500px;
-      max-height: 90vh;
-      background: var(--card-bg);
+      max-width: 480px;
       border-radius: 20px 20px 0 0;
-      padding: 20px;
+      max-height: 90vh;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      overflow-y: scroll;
-      box-sizing: border-box;
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+      overflow: hidden;
+      box-shadow: 0 -4px 30px rgba(0,0,0,0.25);
+      animation: sheetUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-    .settings-header {
+
+    @keyframes sheetUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      padding: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 0.5px solid var(--separator);
-      padding-bottom: 12px;
+      background: #ffffff;
+      border-bottom: 0.5px solid var(--ios-separator);
     }
-    .settings-header h3 { margin: 0; font-size: 20px; font-weight: 700; }
-    .settings-close-btn {
-      background: var(--secondary-bg);
+    .modal-header h2 {
+      font-size: 17px;
+      font-weight: 600;
+    }
+    .modal-close {
+      color: var(--ios-blue);
+      background: none;
       border: none;
-      color: var(--accent);
-      padding: 6px 14px;
-      border-radius: 14px;
-      font-size: 15px;
+      font-size: 17px;
       font-weight: 600;
       cursor: pointer;
     }
 
-    .set-group {
-      background: var(--secondary-bg);
-      border-radius: 12px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
     }
-    .set-group-title {
+
+    .settings-section {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .settings-section h4 {
       font-size: 12px;
-      font-weight: 700;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--ios-text-secondary);
+      margin-bottom: 10px;
       letter-spacing: 0.5px;
     }
-    .set-input-row {
+
+    .form-row {
       display: flex;
       flex-direction: column;
       gap: 4px;
+      margin-bottom: 10px;
     }
-    .set-input-row label {
-      font-size: 12px;
-      color: var(--text-muted);
+    .form-row:last-child {
+      margin-bottom: 0;
     }
-    .set-input-row input, .set-input-row textarea, .set-input-row select {
-      background: var(--card-bg);
-      border: 1px solid var(--separator);
-      border-radius: 8px;
+    .form-row label {
+      font-size: 13px;
+      color: #636366;
+    }
+    .form-row input, .form-row select, .form-row textarea {
       padding: 8px 10px;
-      color: var(--text);
+      border-radius: 8px;
+      border: 1px solid #d1d1d6;
       font-size: 15px;
-      font-family: inherit;
-      outline: none;
-    }
-    .set-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-    }
-    .set-btn.alt {
-      background: rgba(255,255,255,0.1);
-      color: var(--text);
-    }
-    .set-btn.danger {
-      background: var(--red);
+      font-family: var(--font-family);
+      background: #fafafa;
     }
 
-    /* Status indicator */
-    .phase-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .badge-armed { background: #fee2e2; color: #dc2626; }
+    .badge-done { background: #dcfce7; color: #16a34a; }
+    .badge-wait { background: #fef3c7; color: #d97706; }
+
+    .btn-action {
+      background: var(--ios-blue);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .btn-secondary {
+      background: #e5e5ea;
+      color: #000;
+      border: none;
+      padding: 8px 12px;
       border-radius: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      background: rgba(48, 209, 88, 0.16);
-      color: var(--green);
-      width: fit-content;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 6px;
+      width: 100%;
     }
   </style>
 </head>
-<body class="theme-dark">
-
-<div id="app">
-  <!-- Top Bar -->
-  <div class="nav-bar">
-    <div class="nav-left">
-      <button class="nav-btn" id="listsBtn">
-        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Lists
-      </button>
-    </div>
-    <div class="nav-title" id="navTitle">Contacts</div>
-    <div class="nav-right">
-      <button class="nav-btn" id="addContactBtn">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke-linecap="round"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- Large Title -->
-  <div class="large-header">
-    <h1 class="large-title">Contacts</h1>
-  </div>
-
-  <!-- Search Bar (PIN 2769 unlocks Settings) -->
-  <div class="search-wrap">
-    <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2" fill="none"/><line x1="16.5" y1="16.5" x2="21.5" y2="21.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-    <input type="text" class="search-box" id="searchInput" placeholder="Search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-    <svg class="mic-icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-  </div>
-
-  <!-- Main Scrollable List -->
-  <div class="contact-list-container" id="contactList">
-    <!-- My Card -->
-    <div class="my-card" id="myCardBtn">
-      <div class="my-card-avatar" id="myCardInitials">RD</div>
-      <div class="my-card-info">
-        <div class="my-card-name" id="myCardName">Robert Dolan</div>
-        <div class="my-card-sub">My Card</div>
+<body>
+  <div id="app">
+    <!-- VIEW: CONTACT LIST -->
+    <div id="view-list" class="screen">
+      <div class="nav-bar-large">
+        <div class="top-actions">
+          <button class="nav-btn" id="btn-lists">Lists</button>
+          <button class="nav-btn bold" id="btn-plus">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="large-title">Contacts</div>
+        <div class="search-wrapper">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="text" id="search-input" placeholder="Search" autocomplete="off" autocorrect="off" spellcheck="false">
+          </div>
+        </div>
       </div>
+
+      <div class="contacts-scroll" id="contacts-scroll">
+        <!-- MY CARD -->
+        <div class="my-card" id="my-card">
+          <div class="my-card-avatar" id="my-card-avatar">RD</div>
+          <div class="my-card-info">
+            <h3 id="my-card-name">Robert Dolan</h3>
+            <p>My Card</p>
+          </div>
+        </div>
+
+        <!-- CONTACT SECTIONS CONTAINER -->
+        <div id="contacts-container"></div>
+
+        <!-- TOTAL FOOTER -->
+        <div class="total-footer" id="total-footer">0 Contacts</div>
+      </div>
+
+      <!-- ALPHABET SCRUBBER -->
+      <div class="alpha-scrubber" id="scrubber"></div>
     </div>
 
-    <!-- Contacts Rendered Dynamically -->
-    <div id="contactsContent"></div>
-  </div>
-
-  <!-- Right A-Z Scrubber -->
-  <div class="az-scrubber" id="azScrubber"></div>
-
-  <!-- Contact Detail View Sheet -->
-  <div class="detail-view" id="detailView">
-    <div class="nav-bar" style="position: sticky; top: 0;">
-      <div class="nav-left">
-        <button class="nav-btn" id="detailBackBtn">
-          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Contacts
+    <!-- VIEW: CONTACT DETAIL -->
+    <div id="view-detail" class="screen">
+      <div class="detail-nav">
+        <button class="back-btn" id="btn-back">
+          <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          <span>Contacts</span>
         </button>
+        <button class="nav-btn" style="font-weight: 500;">Edit</button>
       </div>
-      <div class="nav-title"></div>
-      <div class="nav-right">
-        <button class="nav-btn" style="font-weight: 600;">Edit</button>
+
+      <div class="detail-scroll">
+        <!-- HERO -->
+        <div class="detail-hero">
+          <div class="detail-avatar" id="detail-avatar">--</div>
+          <div class="detail-name" id="detail-name">Contact Name</div>
+          <div class="detail-org" id="detail-org"></div>
+        </div>
+
+        <!-- 4 ACTION PILLS -->
+        <div class="action-grid">
+          <div class="action-pill">
+            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+            <span>message</span>
+          </div>
+          <div class="action-pill">
+            <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            <span>call</span>
+          </div>
+          <div class="action-pill">
+            <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+            <span>video</span>
+          </div>
+          <div class="action-pill">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <span>mail</span>
+          </div>
+        </div>
+
+        <!-- PHONE CARD -->
+        <div class="card-group" id="card-phone-group">
+          <div class="card-item">
+            <span class="card-label">mobile</span>
+            <span class="card-value" id="detail-phone">(555) 000-0000</span>
+          </div>
+        </div>
+
+        <!-- BIRTHDAY CARD -->
+        <div class="card-group" id="card-birthday-group" style="display: none;">
+          <div class="card-item">
+            <span class="card-label">birthday</span>
+            <span class="card-value black" id="detail-birthday">October 14</span>
+          </div>
+        </div>
+
+        <!-- EMAIL CARD -->
+        <div class="card-group" id="card-email-group" style="display: none;">
+          <div class="card-item">
+            <span class="card-label">home</span>
+            <span class="card-value" id="detail-email">email@address.com</span>
+          </div>
+        </div>
+
+        <!-- NOTES CARD -->
+        <div class="card-group" id="card-notes-group" style="display: none;">
+          <div class="card-item">
+            <span class="card-label">Notes</span>
+            <div class="notes-box" id="detail-notes"></div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="detail-header">
-      <div class="detail-avatar" id="detailAvatar">--</div>
-      <div class="detail-name" id="detailName">--</div>
+    <!-- COVERT SETTINGS MODAL -->
+    <div id="settings-modal">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h2>Hypermnesia Controller</h2>
+          <button class="modal-close" id="btn-close-modal">Done</button>
+        </div>
+        <div class="modal-body">
+          <!-- LIVE STATUS -->
+          <div class="settings-section">
+            <h4>Live Engine Status</h4>
+            <div style="font-size: 14px; line-height: 22px;">
+              <div>Current Phase: <strong id="lbl-status-phase">Phase 1 (Waiting)</strong></div>
+              <div>Intervening Opened: <strong id="lbl-status-count">0</strong></div>
+              <div>Forced Contacts: <strong id="lbl-status-forced">0</strong></div>
+            </div>
+            <button class="btn-secondary" id="btn-reset-routine">Reset Entire Routine</button>
+          </div>
 
-      <div class="action-row">
-        <div class="action-pill"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>message</span></div>
-        <div class="action-pill"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>call</span></div>
-        <div class="action-pill"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span>FaceTime</span></div>
-        <div class="action-pill"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>mail</span></div>
-      </div>
-    </div>
+          <!-- TRIGGER MODE -->
+          <div class="settings-section">
+            <h4>Phase 2 Arming Trigger</h4>
+            <div class="form-row">
+              <label>Trigger Method:</label>
+              <select id="cfg-trigger-mode">
+                <option value="both">Both (Scroll to top OR open N contacts)</option>
+                <option value="scroll">Scroll to top only</option>
+                <option value="count">Open N contacts only</option>
+                <option value="manual">Manual Arm only</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Intervening Contacts Threshold:</label>
+              <input type="number" id="cfg-threshold" min="1" max="10" value="3">
+            </div>
+            <button class="btn-action" id="btn-arm-p2-now">Arm Phase 2 Now</button>
+          </div>
 
-    <div class="info-group">
-      <div class="info-row">
-        <span class="info-label">mobile</span>
-        <span class="info-value" id="detailPhone">--</span>
-      </div>
-      <div class="info-row" id="detailBdayRow">
-        <span class="info-label">birthday</span>
-        <span class="info-value plain" id="detailBday">--</span>
-      </div>
-    </div>
+          <!-- PHASE 1 TARGET DETAILS -->
+          <div class="settings-section">
+            <h4>Phase 1 Forced Details (Any Contact Opened)</h4>
+            <div class="form-row">
+              <label>Forced Phone Number:</label>
+              <input type="text" id="cfg-p1-phone" value="(212) 849-2041">
+            </div>
+            <div class="form-row">
+              <label>Forced Birthday:</label>
+              <input type="text" id="cfg-p1-bday" value="October 14">
+            </div>
+          </div>
 
-    <div class="info-group" id="detailAddressGroup">
-      <div class="info-row">
-        <span class="info-label">home</span>
-        <span class="info-value plain" id="detailAddress">--</span>
-      </div>
-    </div>
+          <!-- PHASE 2 TARGET DETAILS -->
+          <div class="settings-section">
+            <h4>Phase 2 Forced Details (Next Contact Opened)</h4>
+            <div class="form-row">
+              <label>Forced Phone Number:</label>
+              <input type="text" id="cfg-p2-phone" value="(415) 672-9183">
+            </div>
+            <div class="form-row">
+              <label>Forced Notes (Pin, Allergy, Car, etc.):</label>
+              <textarea id="cfg-p2-notes" rows="3">Door Code: 4821 • Severe allergy to shellfish • Drives a 1988 Porsche 911</textarea>
+            </div>
+          </div>
 
-    <div class="info-group" id="detailNoteGroup">
-      <div class="info-row">
-        <span class="info-label">notes</span>
-        <span class="info-value note-val" id="detailNotes">--</span>
-      </div>
-    </div>
-  </div>
+          <!-- PHASE 3 THREE-DIGIT SEARCH -->
+          <div class="settings-section">
+            <h4>Phase 3 (3-Digit Force Number)</h4>
+            <div class="form-row">
+              <label>Prefix / Area Code Pattern:</label>
+              <input type="text" id="cfg-p3-pattern" value="(212) {XXX}-4912">
+            </div>
+          </div>
 
-  <!-- Covert Settings Modal (Opened by PIN 2769) -->
-  <div class="settings-modal" id="settingsModal">
-    <div class="settings-sheet">
-      <div class="settings-header">
-        <h3>Hypermnesia Settings</h3>
-        <button class="settings-close-btn" id="closeSettingsBtn">Done</button>
-      </div>
-
-      <!-- Current State Badge -->
-      <div class="set-group">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span class="set-group-title">Routine State Machine</span>
-          <span class="phase-badge" id="settingsPhaseBadge">PHASE 1: PHONE / DOB</span>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="set-btn alt" style="flex:1;" onclick="setRoutinePhase(1)">Phase 1</button>
-          <button class="set-btn alt" style="flex:1;" onclick="setRoutinePhase(2)">Phase 2</button>
-          <button class="set-btn alt" style="flex:1;" onclick="setRoutinePhase(3)">Phase 3</button>
-        </div>
-        <button class="set-btn" onclick="resetRoutine()">↺ Reset to Phase 1</button>
-      </div>
-
-      <!-- Import Contact List (.vcf) -->
-      <div class="set-group">
-        <span class="set-group-title">Import Custom Contacts (.vcf)</span>
-        <p style="font-size:13px; color:var(--text-muted); margin:0;">
-          Export from your iPhone Contacts app: <b>Lists &gt; All Contacts (hold) &gt; Export &gt; Save to Files</b>, then select it below:
-        </p>
-        <input type="file" id="vcfFileInput" accept=".vcf,text/vcard" style="display:none;">
-        <button class="set-btn" onclick="document.getElementById('vcfFileInput').click()">📂 Select .vcf File from iPhone</button>
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-muted);">
-          <span>Loaded Contacts: <b id="loadedCountLabel" style="color:var(--text);">500</b></span>
-          <a href="#" style="color:var(--accent); text-decoration:none;" onclick="restoreDefaultContacts(); return false;">Restore 500 Defaults</a>
-        </div>
-      </div>
-
-      <!-- Anchor 1 Customization (Phase 1) -->
-      <div class="set-group">
-        <span class="set-group-title">Anchor 1: Phone &amp; Birthday Force</span>
-        <div class="set-input-row">
-          <label>Full Name</label>
-          <input type="text" id="a1Name" value="Liam Henderson">
-        </div>
-        <div class="set-input-row">
-          <label>Phone Number (10 digits)</label>
-          <input type="text" id="a1Phone" value="(212) 849-2041">
-        </div>
-        <div class="set-input-row">
-          <label>Birthday</label>
-          <input type="text" id="a1Bday" value="October 14">
-        </div>
-        <div class="set-input-row">
-          <label>Home Address</label>
-          <input type="text" id="a1Address" value="342 W 57th St, New York, NY 10019">
-        </div>
-      </div>
-
-      <!-- Anchor 2 Customization (Phase 2) -->
-      <div class="set-group">
-        <span class="set-group-title">Anchor 2: Deep Notes &amp; Security Force</span>
-        <div class="set-input-row">
-          <label>Full Name</label>
-          <input type="text" id="a2Name" value="Elena Rostova">
-        </div>
-        <div class="set-input-row">
-          <label>Phone Number</label>
-          <input type="text" id="a2Phone" value="(415) 672-9183">
-        </div>
-        <div class="set-input-row">
-          <label>Secret Notes (Door code, allergies, car)</label>
-          <textarea id="a2Notes" rows="2">Door Code: 4821 • Severe allergy to shellfish • Drives a 1988 Porsche 911</textarea>
-        </div>
-      </div>
-
-      <!-- Anchor 3 Customization (Phase 3) -->
-      <div class="set-group">
-        <span class="set-group-title">Anchor 3: 3-Digit Reverse Search Target</span>
-        <div class="set-input-row">
-          <label>Full Name</label>
-          <input type="text" id="a3Name" value="Julian Mercer">
-        </div>
-        <div class="set-input-row">
-          <label>Base Area Code &amp; Prefix</label>
-          <input type="text" id="a3Prefix" value="(555)">
-        </div>
-        <div class="set-input-row">
-          <label>Notes</label>
-          <input type="text" id="a3Notes" value="Private line • VIP Client">
-        </div>
-      </div>
-
-      <!-- Theme & Appearance -->
-      <div class="set-group">
-        <span class="set-group-title">Appearance &amp; My Card</span>
-        <div class="set-input-row">
-          <label>My Card Name</label>
-          <input type="text" id="setMyName" value="Robert Dolan">
-        </div>
-        <div class="set-input-row">
-          <label>Theme</label>
-          <select id="themeSelect">
-            <option value="dark">Dark Mode</option>
-            <option value="light">Light Mode</option>
-            <option value="auto">System Match</option>
-          </select>
+          <!-- IMPORT USER CONTACTS (.VCF) -->
+          <div class="settings-section">
+            <h4>Contact Directory (.vcf Import)</h4>
+            <p style="font-size: 13px; color: #636366; margin-bottom: 8px;">
+              Only genuine contacts you import will appear in the app. No synthetic/fake contacts are added.
+            </p>
+            <input type="file" id="file-vcf" accept=".vcf,text/vcard" style="font-size: 13px; margin-bottom: 8px;">
+            <button class="btn-secondary" id="btn-clear-contacts" style="color: #dc2626;">Wipe All Imported Contacts</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-(() => {
-  "use strict";
+  <script>
+    /* HYPERMNESIA ENGINE - IN-CARD DETAIL FORCING */
 
-  // Configuration & State
-  const SETTINGS_PIN = "2769";
-  let routinePhase = 1; // 1 = Liam, 2 = Elena, 3 = Julian Search
-  let contacts = [];
-  let isSearchActive = false;
-  let activeDetailContact = null;
+    const SETTINGS_PIN = "2769";
+    const STORAGE_KEY_CONTACTS = "hypermnesia_real_contacts_v1";
+    const STORAGE_KEY_OVERRIDES = "hypermnesia_overrides_v1";
+    const STORAGE_KEY_CONFIG = "hypermnesia_config_v1";
 
-  // Anchors (Default 3 Force Targets)
-  let anchors = {
-    a1: {
-      id: "anchor_1",
-      firstName: "Liam",
-      lastName: "Henderson",
-      name: "Liam Henderson",
-      phone: "(212) 849-2041",
-      bday: "October 14",
-      address: "342 W 57th St, New York, NY 10019",
-      notes: "Met at Manhattan corporate dinner"
-    },
-    a2: {
-      id: "anchor_2",
-      firstName: "Elena",
-      lastName: "Rostova",
-      name: "Elena Rostova",
-      phone: "(415) 672-9183",
-      bday: "May 22",
-      address: "742 Montgomery St, San Francisco, CA 94111",
-      notes: "Door Code: 4821 • Severe allergy to shellfish • Drives a 1988 Porsche 911"
-    },
-    a3: {
-      id: "anchor_3",
-      firstName: "Julian",
-      lastName: "Mercer",
-      name: "Julian Mercer",
-      phone: "(555) 742-1984",
-      bday: "August 9",
-      address: "100 Wall St, New York, NY 10005",
-      notes: "Private line • VIP Client"
-    }
-  };
+    // DEFAULT CONFIG
+    let config = {
+      triggerMode: "both", // both, scroll, count, manual
+      threshold: 3,
+      p1Phone: "(212) 849-2041",
+      p1Bday: "October 14",
+      p2Phone: "(415) 672-9183",
+      p2Notes: "Door Code: 4821 • Severe allergy to shellfish • Drives a 1988 Porsche 911",
+      p3Pattern: "(212) {XXX}-4912"
+    };
 
-  // Load Saved Settings from LocalStorage
-  function loadSavedConfig() {
-    try {
-      const savedAnchors = localStorage.getItem("hyp_anchors");
-      if (savedAnchors) anchors = JSON.parse(savedAnchors);
-      const savedPhase = localStorage.getItem("hyp_phase");
-      if (savedPhase) routinePhase = Number(savedPhase) || 1;
-      const savedMyName = localStorage.getItem("hyp_my_name");
-      if (savedMyName) {
-        document.getElementById("myCardName").textContent = savedMyName;
-        document.getElementById("setMyName").value = savedMyName;
-        const inits = savedMyName.split(" ").map(w => w[0]).join("").toUpperCase();
-        document.getElementById("myCardInitials").textContent = inits || "ME";
+    // ACTIVE RUNTIME STATE
+    let contacts = [];
+    let contactOverrides = {}; // id -> { phone, bday, notes, email, org }
+    let currentPhase = 1; // 1 = waiting for P1 contact, 1.5 = P1 done, counting/waiting for scroll, 2 = armed for P2, 2.5 = P2 done, 3 = search force
+    let interveningCount = 0;
+    let phase1ContactId = null;
+    let phase2ContactId = null;
+    let activeDetailContact = null;
+
+    // LOAD STORED DATA
+    function loadState() {
+      try {
+        const storedConfig = localStorage.getItem(STORAGE_KEY_CONFIG);
+        if (storedConfig) config = { ...config, ...JSON.parse(storedConfig) };
+
+        const storedContacts = localStorage.getItem(STORAGE_KEY_CONTACTS);
+        if (storedContacts) contacts = JSON.parse(storedContacts);
+
+        const storedOverrides = localStorage.getItem(STORAGE_KEY_OVERRIDES);
+        if (storedOverrides) contactOverrides = JSON.parse(storedOverrides);
+      } catch (e) {
+        console.error("Failed to load local storage:", e);
       }
-      const savedTheme = localStorage.getItem("hyp_theme") || "dark";
-      setTheme(savedTheme);
-      document.getElementById("themeSelect").value = savedTheme;
-    } catch (_) {}
-  }
+    }
 
-  function saveConfig() {
-    try {
-      localStorage.setItem("hyp_anchors", JSON.stringify(anchors));
-      localStorage.setItem("hyp_phase", String(routinePhase));
-    } catch (_) {}
-  }
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(config));
+        localStorage.setItem(STORAGE_KEY_CONTACTS, JSON.stringify(contacts));
+        localStorage.setItem(STORAGE_KEY_OVERRIDES, JSON.stringify(contactOverrides));
+      } catch (e) {
+        console.error("Failed to save local storage:", e);
+      }
+    }
 
-  function setTheme(t) {
-    document.body.className = (t === "light") ? "theme-light" : (t === "auto" ? "theme-auto" : "theme-dark");
-    try { localStorage.setItem("hyp_theme", t); } catch(_) {}
-  }
+    // VCF PARSER
+    function parseVCF(vcfText) {
+      const parsed = [];
+      const cards = vcfText.split(/BEGIN:VCARD[\r\n]+/i);
+      let idCounter = 1;
 
-  // Generate 500 Default Hyper-Realistic Contacts
-  function generateDefaultContacts() {
-    const FIRST_NAMES = [
-      "Alexander", "Amelia", "Anthony", "Aria", "Asher", "Ava", "Benjamin", "Brooke", "Caleb", "Charlotte",
-      "Chloe", "Christian", "Daniel", "David", "Dominic", "Eleanor", "Eli", "Elizabeth", "Ella", "Emily",
-      "Ethan", "Eva", "Evelyn", "Ezra", "Gabriel", "Grace", "Hannah", "Harper", "Henry", "Isaac",
-      "Isabella", "Jack", "Jacob", "James", "Jasmine", "Jasper", "Jordan", "Joseph", "Joshua", "Julian",
-      "Kai", "Leo", "Levi", "Liam", "Lily", "Lucas", "Lucy", "Luke", "Madelyn", "Mason",
-      "Mateo", "Maya", "Mia", "Michael", "Mila", "Miles", "Nathan", "Nolan", "Nora", "Oliver",
-      "Olivia", "Owen", "Penelope", "Roman", "Ruby", "Ryan", "Samuel", "Sarah", "Sebastian", "Silas",
-      "Sophia", "Stella", "Theodore", "Thomas", "Violet", "William", "Wyatt", "Zackary", "Zara", "Zoe"
-    ];
+      for (const card of cards) {
+        if (!card.trim()) continue;
+        const lines = card.split(/[\r\n]+/);
+        let fullName = "";
+        let phone = "";
+        let email = "";
+        let bday = "";
+        let org = "";
+        let notes = "";
 
-    const LAST_NAMES = [
-      "Adams", "Anderson", "Baker", "Barnes", "Bell", "Bennett", "Brooks", "Campbell", "Carter", "Clark",
-      "Collins", "Cooper", "Davis", "Diaz", "Edwards", "Evans", "Foster", "Garcia", "Gray", "Green",
-      "Hall", "Harris", "Hayes", "Henderson", "Hill", "Howard", "Hughes", "Jackson", "Jenkins", "Johnson",
-      "Kelly", "King", "Lewis", "Long", "Marshall", "Martin", "Martinez", "Miller", "Mitchell", "Moore",
-      "Morgan", "Morris", "Murphy", "Nelson", "Parker", "Perez", "Peterson", "Phillips", "Price", "Reed",
-      "Reyes", "Richardson", "Rivera", "Roberts", "Robinson", "Rodriguez", "Ross", "Rostova", "Russell", "Scott",
-      "Simmons", "Smith", "Stewart", "Taylor", "Thomas", "Thompson", "Torres", "Turner", "Vance", "Walker",
-      "Ward", "Watson", "White", "Williams", "Wilson", "Wood", "Wright", "Young"
-    ];
+        for (let rawLine of lines) {
+          rawLine = rawLine.trim();
+          if (rawLine.startsWith("FN:") || rawLine.startsWith("FN;")) {
+            fullName = rawLine.substring(rawLine.indexOf(":") + 1).trim();
+          } else if (rawLine.startsWith("TEL") && !phone) {
+            phone = rawLine.substring(rawLine.indexOf(":") + 1).trim();
+          } else if (rawLine.startsWith("EMAIL") && !email) {
+            email = rawLine.substring(rawLine.indexOf(":") + 1).trim();
+          } else if (rawLine.startsWith("BDAY:") || rawLine.startsWith("BDAY;")) {
+            bday = rawLine.substring(rawLine.indexOf(":") + 1).trim();
+          } else if (rawLine.startsWith("ORG:") || rawLine.startsWith("ORG;")) {
+            org = rawLine.substring(rawLine.indexOf(":") + 1).trim().replace(/;/g, " ");
+          } else if (rawLine.startsWith("NOTE:") || rawLine.startsWith("NOTE;")) {
+            notes = rawLine.substring(rawLine.indexOf(":") + 1).trim().replace(/\\n/g, "\n");
+          }
+        }
 
-    const CITIES = [
-      "New York, NY", "Brooklyn, NY", "Boston, MA", "Greenwich, CT", "Philadelphia, PA",
-      "Chicago, IL", "Austin, TX", "Dallas, TX", "Denver, CO", "San Francisco, CA", "Seattle, WA"
-    ];
+        if (fullName) {
+          parsed.push({
+            id: "c_" + (Date.now() % 1000000) + "_" + (idCounter++),
+            name: fullName,
+            phone: phone || "(555) 019-2831",
+            email: email,
+            birthday: bday,
+            org: org,
+            notes: notes
+          });
+        }
+      }
 
-    const list = [];
-    let count = 0;
+      // Sort alphabetically by name
+      parsed.sort((a, b) => a.name.localeCompare(b.name));
+      return parsed;
+    }
 
-    for (let f of FIRST_NAMES) {
-      for (let l of LAST_NAMES) {
-        if (count >= 520) break;
-        // Skip names that clash with our 3 anchors
-        if ((f === "Liam" && l === "Henderson") || (f === "Elena" && l === "Rostova") || (f === "Julian" && l === "Mercer")) continue;
+    // RENDER CONTACT LIST
+    function renderContactList(filterQuery = "") {
+      const container = document.getElementById("contacts-container");
+      container.innerHTML = "";
 
-        const area = [212, 646, 917, 347, 415, 617, 203, 312, 773, 206][count % 10];
-        const mid = String(100 + (count * 7) % 899).padStart(3, "0");
-        const end = String(1000 + (count * 13) % 8999);
-        const city = CITIES[count % CITIES.length];
+      const query = filterQuery.trim().toLowerCase();
+      let filtered = contacts;
 
-        list.push({
-          id: `c_${count}`,
-          firstName: f,
-          lastName: l,
-          name: `${f} ${l}`,
-          phone: `(${area}) ${mid}-${end}`,
-          bday: `${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][count % 12]} ${(count % 28) + 1}`,
-          address: `${100 + (count * 3) % 899} Main St, ${city}`,
-          notes: (count % 7 === 0) ? `Acquaintance from ${city}` : ""
+      // PHASE 3 CHECK: If query is 3 digits (e.g., "834")
+      const isThreeDigitSearch = /^\d{3}$/.test(query);
+
+      if (isThreeDigitSearch) {
+        // In Phase 3, 3 digits match our force target (or Phase 1 contact)
+        const targetContact = contacts.find(c => c.id === phase1ContactId) || contacts[0];
+        if (targetContact) {
+          // Dynamic force phone containing the 3 digits
+          const dynamicPhone = config.p3Pattern.replace("{XXX}", query);
+          contactOverrides[targetContact.id] = {
+            ...(contactOverrides[targetContact.id] || {}),
+            phone: dynamicPhone
+          };
+          saveState();
+
+          // Render only this contact with highlight
+          renderSectionGroup(container, "Top Name Match", [targetContact], query);
+          document.getElementById("total-footer").textContent = "1 Contact Found";
+          return;
+        }
+      }
+
+      if (query) {
+        filtered = contacts.filter(c => {
+          const override = contactOverrides[c.id] || {};
+          const phone = override.phone || c.phone;
+          return c.name.toLowerCase().includes(query) || phone.replace(/\D/g, "").includes(query);
         });
-        count++;
       }
-    }
 
-    // Blend the 3 anchors naturally into their alphabetical places
-    list.push(anchors.a1);
-    list.push(anchors.a2);
-    list.push(anchors.a3);
-
-    // Sort alphabetically by Last Name, then First Name
-    list.sort((a, b) => a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName));
-
-    return list;
-  }
-
-  function initContacts() {
-    try {
-      const stored = localStorage.getItem("hyp_custom_contacts");
-      if (stored) {
-        contacts = JSON.parse(stored);
-        ensureAnchorsInList();
-      } else {
-        contacts = generateDefaultContacts();
+      if (filtered.length === 0) {
+        if (contacts.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+              <h3>No Contacts</h3>
+              <p>Type <strong>2769</strong> in the search bar above to import your .vcf contacts file.</p>
+            </div>
+          `;
+          document.getElementById("total-footer").textContent = "0 Contacts";
+        } else {
+          container.innerHTML = `
+            <div class="empty-state">
+              <h3>No Results</h3>
+              <p>No contacts matching "${filterQuery}"</p>
+            </div>
+          `;
+          document.getElementById("total-footer").textContent = "0 Contacts Found";
+        }
+        return;
       }
-    } catch (_) {
-      contacts = generateDefaultContacts();
-    }
-    renderContactsList(contacts);
-  }
 
-  function ensureAnchorsInList() {
-    // Make sure anchors are in the contact list without duplicates
-    const aIds = new Set(["anchor_1", "anchor_2", "anchor_3"]);
-    contacts = contacts.filter(c => !aIds.has(c.id));
-    contacts.push(anchors.a1);
-    contacts.push(anchors.a2);
-    contacts.push(anchors.a3);
-    contacts.sort((a, b) => (a.lastName || "").localeCompare(b.lastName || "") || (a.firstName || "").localeCompare(b.firstName || ""));
-  }
+      // Group by first letter
+      const groups = {};
+      for (const c of filtered) {
+        let firstLetter = (c.name.trim()[0] || "#").toUpperCase();
+        if (!/[A-Z]/.test(firstLetter)) firstLetter = "#";
+        if (!groups[firstLetter]) groups[firstLetter] = [];
+        groups[firstLetter].push(c);
+      }
 
-  // Render Contacts into Groups (A-Z)
-  function renderContactsList(items) {
-    const container = document.getElementById("contactsContent");
-    container.innerHTML = "";
+      const sortedLetters = Object.keys(groups).sort((a, b) => {
+        if (a === "#") return 1;
+        if (b === "#") return -1;
+        return a.localeCompare(b);
+      });
 
-    const groups = {};
-    for (let c of items) {
-      const letter = ((c.lastName && c.lastName[0]) || (c.firstName && c.firstName[0]) || "#").toUpperCase();
-      const key = (letter >= "A" && letter <= "Z") ? letter : "#";
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(c);
+      for (const letter of sortedLetters) {
+        renderSectionGroup(container, letter, groups[letter], query);
+      }
+
+      document.getElementById("total-footer").textContent = `${filtered.length} Contacts`;
     }
 
-    const sortedLetters = Object.keys(groups).sort((a, b) => {
-      if (a === "#") return -1;
-      if (b === "#") return 1;
-      return a.localeCompare(b);
-    });
+    function renderSectionGroup(container, headerTitle, list, query) {
+      const header = document.createElement("div");
+      header.className = "section-header";
+      header.id = "sec-" + headerTitle;
+      header.textContent = headerTitle;
+      container.appendChild(header);
 
-    for (let letter of sortedLetters) {
-      const secHeader = document.createElement("div");
-      secHeader.className = "section-header";
-      secHeader.id = `sec_${letter}`;
-      secHeader.textContent = letter;
-      container.appendChild(secHeader);
+      const groupDiv = document.createElement("div");
+      groupDiv.className = "contact-list-group";
 
-      for (let c of groups[letter]) {
+      for (const c of list) {
         const row = document.createElement("div");
         row.className = "contact-row";
-        row.dataset.id = c.id;
+        
+        // USER REQUIREMENT: "Dont bold the last name" -> Uniform normal text
+        let displayName = escapeHtml(c.name);
 
-        const isA1 = (c.id === "anchor_1");
-        const isA2 = (c.id === "anchor_2");
-        const isA3 = (c.id === "anchor_3");
+        let subHtml = "";
+        const override = contactOverrides[c.id] || {};
+        const effectivePhone = override.phone || c.phone;
 
-        let matchSnippet = "";
-        if (isSearchActive && c._matchedPhone) {
-          matchSnippet = `<span class="search-match-phone">${c._matchedPhone}</span>`;
+        // In search mode, show phone sub-line
+        if (query) {
+          let phoneDisplay = escapeHtml(effectivePhone);
+          if (/^\d{3}$/.test(query)) {
+            phoneDisplay = phoneDisplay.replace(new RegExp(`(${query})`, "g"), '<span class="highlight-digit">$1</span>');
+          }
+          subHtml = `<div class="contact-sub">${phoneDisplay}</div>`;
         }
 
         row.innerHTML = `
-          <div class="c-name">${c.firstName} <strong>${c.lastName}</strong></div>
-          ${matchSnippet}
+          <div>${displayName}</div>
+          ${subHtml}
         `;
 
-        row.onclick = () => openContactDetail(c);
-        container.appendChild(row);
+        row.addEventListener("click", () => openContactDetail(c));
+        groupDiv.appendChild(row);
       }
+
+      container.appendChild(groupDiv);
     }
 
-    renderScrubber(sortedLetters);
-    document.getElementById("loadedCountLabel").textContent = String(contacts.length);
-  }
-
-  // Right Edge A-Z Touch Scrubber
-  function renderScrubber(letters) {
-    const scrub = document.getElementById("azScrubber");
-    scrub.innerHTML = "";
-    const all = ["#", "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
-    for (let l of all) {
-      const sp = document.createElement("span");
-      sp.className = "az-letter";
-      sp.textContent = l;
-      sp.dataset.l = l;
-      scrub.appendChild(sp);
+    function escapeHtml(str) {
+      return String(str || "").replace(/[&<>"']/g, m => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[m]));
     }
 
-    scrub.onpointerdown = scrub.onpointermove = (e) => {
-      const el = document.elementFromPoint(e.clientX, e.clientY);
-      if (el && el.dataset && el.dataset.l) {
-        scrollToSection(el.dataset.l);
-      }
-    };
-  }
-
-  function scrollToSection(letter) {
-    const el = document.getElementById(`sec_${letter}`);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
-
-  // --- THE INERTIAL SCROLL FORCE ENGINE ---
-  const listEl = document.getElementById("contactList");
-  let isTouching = false;
-  let forceSnapTimer = null;
-
-  listEl.addEventListener("touchstart", () => {
-    isTouching = true;
-    clearTimeout(forceSnapTimer);
-  }, { passive: true });
-
-  listEl.addEventListener("touchend", () => {
-    isTouching = false;
-    // When finger lifts, let momentum run briefly, then softly glide into the force target
-    scheduleForceSnapping();
-  }, { passive: true });
-
-  listEl.addEventListener("scroll", () => {
-    if (!isTouching) {
-      clearTimeout(forceSnapTimer);
-      forceSnapTimer = setTimeout(performMagneticGlide, 180);
-    }
-  }, { passive: true });
-
-  function scheduleForceSnapping() {
-    clearTimeout(forceSnapTimer);
-    forceSnapTimer = setTimeout(performMagneticGlide, 450);
-  }
-
-  function performMagneticGlide() {
-    if (isSearchActive || isTouching) return;
-
-    // Find the target element for current phase
-    const targetId = (routinePhase === 1) ? "anchor_1" : (routinePhase === 2 ? "anchor_2" : null);
-    if (!targetId) return;
-
-    const row = document.querySelector(`.contact-row[data-id="${targetId}"]`);
-    if (!row) return;
-
-    const listRect = listEl.getBoundingClientRect();
-    const rowRect = row.getBoundingClientRect();
-
-    // Center the target row directly in the middle of viewport
-    const offset = rowRect.top - listRect.top - (listRect.height / 2) + (rowRect.height / 2);
-    
-    // Only smooth-scroll if it's within natural momentum reach
-    listEl.scrollBy({ top: offset, behavior: "smooth" });
-  }
-
-  // Open Contact Detail
-  function openContactDetail(c) {
-    activeDetailContact = c;
-    const dv = document.getElementById("detailView");
-    const inits = `${(c.firstName && c.firstName[0]) || ""}${(c.lastName && c.lastName[0]) || ""}`.toUpperCase();
-
-    document.getElementById("detailAvatar").textContent = inits || "👤";
-    document.getElementById("detailName").textContent = c.name;
-    document.getElementById("detailPhone").textContent = c.phone || "None";
-    document.getElementById("detailBday").textContent = c.bday || "None";
-    document.getElementById("detailAddress").textContent = c.address || "None";
-    document.getElementById("detailNotes").textContent = c.notes || "None";
-
-    document.getElementById("detailBdayRow").style.display = c.bday ? "flex" : "none";
-    document.getElementById("detailAddressGroup").style.display = c.address ? "block" : "none";
-    document.getElementById("detailNoteGroup").style.display = c.notes ? "block" : "none";
-
-    dv.classList.add("open");
-  }
-
-  // Back Button (< Contacts) -> Advance to Next Routine Phase!
-  document.getElementById("detailBackBtn").onclick = () => {
-    document.getElementById("detailView").classList.remove("open");
-    // Advance phase automatically
-    if (routinePhase === 1) {
-      routinePhase = 2;
-    } else if (routinePhase === 2) {
-      routinePhase = 3;
-    }
-    updatePhaseUI();
-    saveConfig();
-  };
-
-  function updatePhaseUI() {
-    const badge = document.getElementById("settingsPhaseBadge");
-    if (!badge) return;
-    if (routinePhase === 1) {
-      badge.textContent = "PHASE 1: PHONE / DOB (" + anchors.a1.name + ")";
-    } else if (routinePhase === 2) {
-      badge.textContent = "PHASE 2: NOTES / SECURITY (" + anchors.a2.name + ")";
-    } else {
-      badge.textContent = "PHASE 3: 3-DIGIT SEARCH (" + anchors.a3.name + ")";
-    }
-  }
-
-  window.setRoutinePhase = function(p) {
-    routinePhase = p;
-    updatePhaseUI();
-    saveConfig();
-  };
-
-  window.resetRoutine = function() {
-    routinePhase = 1;
-    updatePhaseUI();
-    saveConfig();
-    document.getElementById("searchInput").value = "";
-    isSearchActive = false;
-    renderContactsList(contacts);
-    closeSettings();
-  };
-
-  // --- SEARCH BAR & PHASE 3 DYNAMIC 3-DIGIT SEARCH ---
-  const searchInput = document.getElementById("searchInput");
-
-  searchInput.addEventListener("input", (e) => {
-    const val = e.target.value.trim();
-
-    // COVERT PIN CHECK: 2769 opens Settings!
-    if (val === SETTINGS_PIN) {
-      e.target.value = "";
-      e.target.blur();
-      openSettings();
-      return;
-    }
-
-    if (!val) {
-      isSearchActive = false;
-      renderContactsList(contacts);
-      return;
-    }
-
-    isSearchActive = true;
-
-    // Check if the user entered 3 digits (e.g. "834")
-    const digitsOnly = val.replace(/\D/g, "");
-    if (digitsOnly.length === 3) {
-      handleThreeDigitReverseSearch(digitsOnly);
-      return;
-    }
-
-    // Normal Standard Search by name/phone
-    const q = val.toLowerCase();
-    const filtered = contacts.filter(c => 
-      c.name.toLowerCase().includes(q) || (c.phone && c.phone.includes(q))
-    );
-    renderContactsList(filtered);
-  });
-
-  function handleThreeDigitReverseSearch(threeDigits) {
-    // Dynamic 3-Digit Force:
-    // Format Julian Mercer's phone number to highlight the exact 3 digits!
-    const prefix = document.getElementById("a3Prefix") ? document.getElementById("a3Prefix").value : "(555)";
-    const customPhone = `${prefix} ${threeDigits}-4819`;
-    
-    // Highlighted HTML for the contact row
-    const highlightedPhone = `${prefix} <span class="search-highlight">${threeDigits}</span>-4819`;
-
-    const forcedJulian = Object.assign({}, anchors.a3, {
-      phone: customPhone,
-      _matchedPhone: highlightedPhone
-    });
-
-    renderContactsList([forcedJulian]);
-  }
-
-  // --- COVERT SETTINGS MODAL ---
-  function openSettings() {
-    document.getElementById("a1Name").value = anchors.a1.name;
-    document.getElementById("a1Phone").value = anchors.a1.phone;
-    document.getElementById("a1Bday").value = anchors.a1.bday;
-    document.getElementById("a1Address").value = anchors.a1.address;
-
-    document.getElementById("a2Name").value = anchors.a2.name;
-    document.getElementById("a2Phone").value = anchors.a2.phone;
-    document.getElementById("a2Notes").value = anchors.a2.notes;
-
-    document.getElementById("a3Name").value = anchors.a3.name;
-    document.getElementById("a3Notes").value = anchors.a3.notes;
-
-    updatePhaseUI();
-    document.getElementById("settingsModal").classList.add("open");
-  }
-
-  function closeSettings() {
-    // Save any edited anchors
-    anchors.a1.name = document.getElementById("a1Name").value.trim() || anchors.a1.name;
-    anchors.a1.phone = document.getElementById("a1Phone").value.trim() || anchors.a1.phone;
-    anchors.a1.bday = document.getElementById("a1Bday").value.trim() || anchors.a1.bday;
-    anchors.a1.address = document.getElementById("a1Address").value.trim() || anchors.a1.address;
-
-    anchors.a2.name = document.getElementById("a2Name").value.trim() || anchors.a2.name;
-    anchors.a2.phone = document.getElementById("a2Phone").value.trim() || anchors.a2.phone;
-    anchors.a2.notes = document.getElementById("a2Notes").value.trim() || anchors.a2.notes;
-
-    anchors.a3.name = document.getElementById("a3Name").value.trim() || anchors.a3.name;
-    anchors.a3.notes = document.getElementById("a3Notes").value.trim() || anchors.a3.notes;
-
-    const myName = document.getElementById("setMyName").value.trim();
-    if (myName) {
-      document.getElementById("myCardName").textContent = myName;
-      document.getElementById("myCardInitials").textContent = myName.split(" ").map(w=>w[0]).join("").toUpperCase();
-      try { localStorage.setItem("hyp_my_name", myName); } catch(_) {}
-    }
-
-    saveConfig();
-    ensureAnchorsInList();
-    renderContactsList(contacts);
-
-    document.getElementById("settingsModal").classList.remove("open");
-  }
-
-  document.getElementById("closeSettingsBtn").onclick = closeSettings;
-  document.getElementById("themeSelect").onchange = (e) => setTheme(e.target.value);
-
-  // --- FAST .VCF (vCard) PARSER ---
-  const vcfInput = document.getElementById("vcfFileInput");
-  vcfInput.addEventListener("change", async (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      const parsed = parseVCard(text);
-      if (parsed.length > 0) {
-        contacts = parsed;
-        ensureAnchorsInList();
-        try {
-          localStorage.setItem("hyp_custom_contacts", JSON.stringify(contacts));
-        } catch(_) {}
-        renderContactsList(contacts);
-        alert(`✓ Successfully imported ${parsed.length} contacts!`);
-      } else {
-        alert("Could not parse any contacts from this .vcf file.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error reading file: " + err.message);
-    }
-  });
-
-  function parseVCard(vcfText) {
-    const cards = vcfText.split(/BEGIN:VCARD/i).slice(1);
-    const parsed = [];
-
-    cards.forEach((card, idx) => {
-      const lines = card.split(/\r?\n/);
-      let fn = "", ln = "", phone = "", bday = "", adr = "", notes = "";
-
-      lines.forEach(line => {
-        const clean = line.trim();
-        if (clean.startsWith("FN:") || clean.startsWith("FN;")) {
-          fn = clean.split(":")[1] || "";
-        } else if (clean.startsWith("N:") || clean.startsWith("N;")) {
-          const parts = (clean.split(":")[1] || "").split(";");
-          ln = parts[0] || "";
-          if (!fn && parts[1]) fn = `${parts[1]} ${ln}`.trim();
-        } else if ((clean.startsWith("TEL") || clean.startsWith("item1.TEL")) && !phone) {
-          phone = clean.split(":")[1] || "";
-        } else if (clean.startsWith("BDAY:")) {
-          bday = clean.split(":")[1] || "";
-        } else if (clean.startsWith("ADR") && !adr) {
-          const parts = (clean.split(":")[1] || "").split(";");
-          adr = parts.filter(Boolean).join(", ");
-        } else if (clean.startsWith("NOTE:")) {
-          notes = clean.split(":")[1] || "";
-        }
-      });
-
-      if (fn || ln) {
-        const fullName = fn || ln;
-        const nameParts = fullName.split(" ");
-        const first = nameParts[0] || "";
-        const last = nameParts.slice(1).join(" ") || ln || first;
-
-        parsed.push({
-          id: `custom_${idx}`,
-          firstName: first,
-          lastName: last,
-          name: fullName,
-          phone: phone || "(555) 000-0000",
-          bday: bday || "",
-          address: adr || "",
-          notes: notes || ""
+    // RENDER ALPHABET SCRUBBER
+    function renderAlphabetScrubber() {
+      const scrubber = document.getElementById("scrubber");
+      scrubber.innerHTML = "";
+      const letters = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","#"];
+      
+      for (const l of letters) {
+        const span = document.createElement("span");
+        span.textContent = l;
+        span.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const target = document.getElementById("sec-" + l);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
         });
+        scrubber.appendChild(span);
+      }
+    }
+
+    // OPEN CONTACT DETAIL & APPLY IN-CARD FORCES
+    function openContactDetail(c) {
+      activeDetailContact = c;
+
+      // INITIALIZE OVERRIDES IF NOT PRESENT
+      if (!contactOverrides[c.id]) {
+        contactOverrides[c.id] = {};
+      }
+
+      // PHASE ENGINE LOGIC:
+      if (currentPhase === 1) {
+        // PHASE 1: Spectator taps ANY contact in the list.
+        // Force Phase 1 details inside this contact!
+        contactOverrides[c.id].phone = config.p1Phone;
+        contactOverrides[c.id].birthday = config.p1Bday;
+        phase1ContactId = c.id;
+
+        // Advance to Phase 1.5 (waiting for trigger)
+        currentPhase = 1.5;
+        interveningCount = 0;
+        updateStatusLabels();
+        saveState();
+
+      } else if (currentPhase === 1.5) {
+        // User opened an intervening contact
+        if (c.id !== phase1ContactId) {
+          interveningCount++;
+          updateStatusLabels();
+
+          // Check count trigger
+          if ((config.triggerMode === "both" || config.triggerMode === "count") && interveningCount >= config.threshold) {
+            // Armed for Phase 2!
+            currentPhase = 2;
+            updateStatusLabels();
+          }
+        }
+
+      } else if (currentPhase === 2) {
+        // PHASE 2 ARMED: The very next contact opened gets Phase 2 details injected!
+        if (c.id !== phase1ContactId) {
+          contactOverrides[c.id].phone = config.p2Phone;
+          contactOverrides[c.id].notes = config.p2Notes;
+          phase2ContactId = c.id;
+
+          currentPhase = 2.5; // Phase 2 complete
+          updateStatusLabels();
+          saveState();
+        }
+      }
+
+      // Populate Detail View using (Overrides || Original contact data)
+      const ov = contactOverrides[c.id] || {};
+      const finalName = c.name;
+      const finalPhone = ov.phone || c.phone || "(555) 019-2831";
+      const finalBirthday = ov.birthday || c.birthday || "";
+      const finalEmail = ov.email || c.email || "";
+      const finalNotes = ov.notes || c.notes || "";
+      const finalOrg = ov.org || c.org || "";
+
+      // Initials for avatar
+      const parts = finalName.trim().split(/\s+/);
+      let initials = parts[0] ? parts[0][0].toUpperCase() : "?";
+      if (parts.length > 1) initials += parts[parts.length - 1][0].toUpperCase();
+
+      document.getElementById("detail-avatar").textContent = initials;
+      document.getElementById("detail-name").textContent = finalName;
+      document.getElementById("detail-org").textContent = finalOrg;
+      document.getElementById("detail-phone").textContent = finalPhone;
+
+      // Birthday card
+      const bdayGroup = document.getElementById("card-birthday-group");
+      if (finalBirthday) {
+        document.getElementById("detail-birthday").textContent = finalBirthday;
+        bdayGroup.style.display = "block";
+      } else {
+        bdayGroup.style.display = "none";
+      }
+
+      // Email card
+      const emailGroup = document.getElementById("card-email-group");
+      if (finalEmail) {
+        document.getElementById("detail-email").textContent = finalEmail;
+        emailGroup.style.display = "block";
+      } else {
+        emailGroup.style.display = "none";
+      }
+
+      // Notes card
+      const notesGroup = document.getElementById("card-notes-group");
+      if (finalNotes) {
+        document.getElementById("detail-notes").textContent = finalNotes;
+        notesGroup.style.display = "block";
+      } else {
+        notesGroup.style.display = "none";
+      }
+
+      // Slide in detail view
+      document.getElementById("view-list").classList.add("slide-left");
+      document.getElementById("view-detail").classList.add("slide-in");
+    }
+
+    // CLOSE CONTACT DETAIL (BACK TO LIST)
+    function closeContactDetail() {
+      document.getElementById("view-detail").classList.remove("slide-in");
+      document.getElementById("view-list").classList.remove("slide-left");
+      activeDetailContact = null;
+      renderContactList(document.getElementById("search-input").value);
+    }
+
+    // SCROLL LISTENER FOR PHASE 2 TRIGGER
+    const scrollContainer = document.getElementById("contacts-scroll");
+    scrollContainer.addEventListener("scroll", () => {
+      // If in Phase 1.5 and user scrolls back to the very top (scrollTop <= 15)
+      if (currentPhase === 1.5 && (config.triggerMode === "both" || config.triggerMode === "scroll")) {
+        if (scrollContainer.scrollTop <= 15) {
+          // Armed for Phase 2!
+          currentPhase = 2;
+          updateStatusLabels();
+          console.log("Hypermnesia: Phase 2 armed via scroll-to-top trigger!");
+        }
       }
     });
 
-    return parsed;
-  }
+    // SEARCH INPUT LISTENER
+    const searchInput = document.getElementById("search-input");
+    searchInput.addEventListener("input", (e) => {
+      const val = e.target.value.trim();
 
-  window.restoreDefaultContacts = function() {
-    try { localStorage.removeItem("hyp_custom_contacts"); } catch(_) {}
-    contacts = generateDefaultContacts();
-    renderContactsList(contacts);
-    alert("Restored 500 default realistic contacts.");
-  };
+      // Check for PIN to open covert settings
+      if (val === SETTINGS_PIN) {
+        e.target.value = "";
+        openSettingsModal();
+        return;
+      }
 
-  // Initialize
-  loadSavedConfig();
-  initContacts();
-})();
-</script>
+      renderContactList(val);
+    });
+
+    // COVERT SETTINGS MODAL
+    function openSettingsModal() {
+      updateStatusLabels();
+      document.getElementById("cfg-trigger-mode").value = config.triggerMode;
+      document.getElementById("cfg-threshold").value = config.threshold;
+      document.getElementById("cfg-p1-phone").value = config.p1Phone;
+      document.getElementById("cfg-p1-bday").value = config.p1Bday;
+      document.getElementById("cfg-p2-phone").value = config.p2Phone;
+      document.getElementById("cfg-p2-notes").value = config.p2Notes;
+      document.getElementById("cfg-p3-pattern").value = config.p3Pattern;
+
+      document.getElementById("settings-modal").classList.add("active");
+    }
+
+    function closeSettingsModal() {
+      config.triggerMode = document.getElementById("cfg-trigger-mode").value;
+      config.threshold = parseInt(document.getElementById("cfg-threshold").value, 10) || 3;
+      config.p1Phone = document.getElementById("cfg-p1-phone").value;
+      config.p1Bday = document.getElementById("cfg-p1-bday").value;
+      config.p2Phone = document.getElementById("cfg-p2-phone").value;
+      config.p2Notes = document.getElementById("cfg-p2-notes").value;
+      config.p3Pattern = document.getElementById("cfg-p3-pattern").value;
+
+      saveState();
+      document.getElementById("settings-modal").classList.remove("active");
+    }
+
+    function updateStatusLabels() {
+      const phaseLbl = document.getElementById("lbl-status-phase");
+      if (currentPhase === 1) {
+        phaseLbl.textContent = "Phase 1 (Waiting for spectator tap)";
+        phaseLbl.style.color = "#007aff";
+      } else if (currentPhase === 1.5) {
+        phaseLbl.textContent = `Phase 1 Done (Waiting for trigger; opened ${interveningCount}/${config.threshold})`;
+        phaseLbl.style.color = "#d97706";
+      } else if (currentPhase === 2) {
+        phaseLbl.textContent = "Phase 2 ARMED (Next tap forces Phase 2)";
+        phaseLbl.style.color = "#dc2626";
+      } else if (currentPhase === 2.5) {
+        phaseLbl.textContent = "Phase 2 Done (Phase 3 search active)";
+        phaseLbl.style.color = "#16a34a";
+      }
+
+      document.getElementById("lbl-status-count").textContent = interveningCount;
+      document.getElementById("lbl-status-forced").textContent = Object.keys(contactOverrides).length;
+    }
+
+    // BUTTON EVENT HANDLERS
+    document.getElementById("btn-back").addEventListener("click", closeContactDetail);
+    document.getElementById("btn-close-modal").addEventListener("click", closeSettingsModal);
+
+    document.getElementById("btn-arm-p2-now").addEventListener("click", () => {
+      currentPhase = 2;
+      updateStatusLabels();
+      alert("Phase 2 is now ARMED. The next contact opened will have Phase 2 details injected!");
+    });
+
+    document.getElementById("btn-reset-routine").addEventListener("click", () => {
+      currentPhase = 1;
+      interveningCount = 0;
+      phase1ContactId = null;
+      phase2ContactId = null;
+      contactOverrides = {};
+      saveState();
+      updateStatusLabels();
+      renderContactList();
+      alert("Routine reset! Contact details restored and Phase 1 is waiting.");
+    });
+
+    // CLEAR CONTACTS
+    document.getElementById("btn-clear-contacts").addEventListener("click", () => {
+      if (confirm("Are you sure you want to wipe all imported contacts?")) {
+        contacts = [];
+        contactOverrides = {};
+        saveState();
+        renderContactList();
+        updateStatusLabels();
+      }
+    });
+
+    // FILE IMPORTER FOR .VCF
+    document.getElementById("file-vcf").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const parsed = parseVCF(event.target.result);
+          if (parsed.length === 0) {
+            alert("No valid contacts found in this .vcf file.");
+            return;
+          }
+          contacts = parsed;
+          saveState();
+          renderContactList();
+          alert(`Successfully imported ${parsed.length} contacts!`);
+        } catch (err) {
+          alert("Error parsing .vcf file: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // INITIALIZATION
+    loadState();
+    renderAlphabetScrubber();
+    renderContactList();
+    updateStatusLabels();
+  </script>
 </body>
 </html>
