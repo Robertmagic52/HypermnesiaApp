@@ -794,8 +794,12 @@
               <input type="text" id="cfg-p2-phone" value="(917) 929-2266">
             </div>
             <div class="form-row">
-              <label>Forced Notes (Pin, Allergy, Car, etc.):</label>
-              <textarea id="cfg-p2-notes" rows="3">Door Code: 4821 • Severe allergy to shellfish • Drives a 1988 Porsche 911</textarea>
+              <label>Company / Organization:</label>
+              <input type="text" id="cfg-p2-org" value="Uber">
+            </div>
+            <div class="form-row">
+              <label>Forced Notes:</label>
+              <textarea id="cfg-p2-notes" rows="3">Uber driver from last year (Nov 2025) • White Toyota Camry • Left jacket in backseat</textarea>
             </div>
           </div>
 
@@ -827,8 +831,8 @@
 
     const SETTINGS_PIN = "2769";
     const STORAGE_KEY_CONTACTS = "hypermnesia_real_contacts_v1";
-    const STORAGE_KEY_OVERRIDES = "hypermnesia_overrides_v2";
-    const STORAGE_KEY_CONFIG = "hypermnesia_config_v2";
+    const STORAGE_KEY_OVERRIDES = "hypermnesia_overrides_v3";
+    const STORAGE_KEY_CONFIG = "hypermnesia_config_v3";
 
     // DEFAULT CONFIG
     let config = {
@@ -837,7 +841,8 @@
       p1Phone: "(914) 393-2342",
       p1Bday: "May 4, 1999",
       p2Phone: "(917) 929-2266",
-      p2Notes: "Door Code: 4821 • Severe allergy to shellfish • Drives a 1988 Porsche 911",
+      p2Org: "Uber",
+      p2Notes: "Uber driver from last year (Nov 2025) • White Toyota Camry • Left jacket in backseat",
       p3Pattern: "(914) {XXX}-2342"
     };
 
@@ -960,8 +965,13 @@
       if (query) {
         filtered = contacts.filter(c => {
           const override = contactOverrides[c.id] || {};
-          const phone = override.phone || c.phone;
-          return c.name.toLowerCase().includes(query) || phone.replace(/\D/g, "").includes(query);
+          const phone = override.phone || c.phone || "";
+          const notes = override.notes || c.notes || "";
+          const org = override.org || c.org || "";
+          return c.name.toLowerCase().includes(query) ||
+                 phone.replace(/\D/g, "").includes(query) ||
+                 notes.toLowerCase().includes(query) ||
+                 org.toLowerCase().includes(query);
         });
       }
 
@@ -1123,6 +1133,7 @@
         if (c.id !== phase1ContactId) {
           contactOverrides[c.id].phone = config.p2Phone;
           contactOverrides[c.id].notes = config.p2Notes;
+          if (config.p2Org) contactOverrides[c.id].org = config.p2Org;
           phase2ContactId = c.id;
 
           currentPhase = 2.5; // Phase 2 complete
@@ -1227,6 +1238,7 @@
       document.getElementById("cfg-p1-phone").value = config.p1Phone;
       document.getElementById("cfg-p1-bday").value = config.p1Bday;
       document.getElementById("cfg-p2-phone").value = config.p2Phone;
+      document.getElementById("cfg-p2-org").value = config.p2Org || "Uber";
       document.getElementById("cfg-p2-notes").value = config.p2Notes;
       document.getElementById("cfg-p3-pattern").value = config.p3Pattern;
 
@@ -1239,6 +1251,7 @@
       config.p1Phone = document.getElementById("cfg-p1-phone").value;
       config.p1Bday = document.getElementById("cfg-p1-bday").value;
       config.p2Phone = document.getElementById("cfg-p2-phone").value;
+      config.p2Org = document.getElementById("cfg-p2-org").value;
       config.p2Notes = document.getElementById("cfg-p2-notes").value;
       config.p3Pattern = document.getElementById("cfg-p3-pattern").value;
 
