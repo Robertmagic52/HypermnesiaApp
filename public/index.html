@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Contacts</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Contacts">
+  <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <style>
+    :root {
+      --bg: #000000;
+      --card-bg: #1c1c1e;
+      --secondary-bg: #2c2c2e;
+      --grouped-bg: #1c1c1e;
+      --separator: rgba(255, 255, 255, 0.15);
+      --text: #ffffff;
+      --text-muted: #8e8e93;
+      --accent: #0a84ff;
+      --green: #30d158;
+      --red: #ff453a;
+      --search-bg: rgba(255, 255, 255, 0.12);
+      --header-bg: rgba(0, 0, 0, 0.85);
+      --avatar-bg: #5e5e62;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root.theme-auto {
+        --bg: #ffffff;
+        --card-bg: #ffffff;
+        --secondary-bg: #f2f2f7;
+        --grouped-bg: #ffffff;
+        --separator: rgba(60, 60, 67, 0.2);
+        --text: #000000;
+        --text-muted: #8e8e93;
+        --accent: #007aff;
+        --green: #34c759;
+        --red: #ff3b30;
+        --search-bg: rgba(142, 142, 147, 0.16);
+        --header-bg: rgba(255, 255, 255, 0.85);
+        --avatar-bg: #d1d1d6;
+      }
+    }
+
+    body.theme-light {
+      --bg: #ffffff;
+      --card-bg: #ffffff;
+      --secondary-bg: #f2f2f7;
+      --grouped-bg: #ffffff;
+      --separator: rgba(60, 60, 67, 0.2);
+      --text: #000000;
+      --text-muted: #8e8e93;
+      --accent: #007aff;
+      --green: #34c759;
+      --red: #ff3b30;
+      --search-bg: rgba(142, 142, 147, 0.16);
+      --header-bg: rgba(255, 255, 255, 0.85);
+      --avatar-bg: #d1d1d6;
+    }
+
+    body.theme-dark {
+      --bg: #000000;
+      --card-bg: #1c1c1e;
+      --secondary-bg: #2c2c2e;
+      --grouped-bg: #1c1c1e;
+      --separator: rgba(255, 255, 255, 0.15);
+      --text: #ffffff;
+      --text-muted: #8e8e93;
+      --accent: #0a84ff;
+      --green: #30d158;
+      --red: #ff453a;
+      --search-bg: rgba(255, 255, 255, 0.12);
+      --header-bg: rgba(0, 0, 0, 0.85);
+      --avatar-bg: #5e5e62;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
+      overflow: hidden;
+      position: fixed;
+    }
+
+    /* Container */
+    #app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Top Nav Bar */
+    .nav-bar {
+      height: 48px;
+      padding-top: env(safe-area-inset-top, 0px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 16px;
+      padding-right: 16px;
+      background: var(--header-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 0.5px solid var(--separator);
+      z-index: 10;
+      flex-shrink: 0;
+    }
+    .nav-left, .nav-right {
+      display: flex;
+      align-items: center;
+      min-width: 60px;
+    }
+    .nav-right { justify-content: flex-end; }
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 17px;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+    .nav-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+
+    /* Large Title Header */
+    .large-header {
+      padding: 10px 16px 6px 16px;
+      flex-shrink: 0;
+    }
+    .large-title {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 0.35px;
+      margin: 0 0 10px 0;
+    }
+
+    /* Native iOS Search Bar */
+    .search-wrap {
+      position: relative;
+      margin: 0 16px 10px 16px;
+      flex-shrink: 0;
+    }
+    .search-box {
+      width: 100%;
+      height: 36px;
+      background: var(--search-bg);
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      padding: 0 34px 0 34px;
+      font-size: 17px;
+      color: var(--text);
+      font-family: inherit;
+    }
+    .search-box::placeholder {
+      color: var(--text-muted);
+    }
+    .search-icon {
+      position: absolute;
+      left: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 17px;
+      height: 17px;
+      fill: var(--text-muted);
+      pointer-events: none;
+    }
+    .mic-icon {
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      fill: var(--text-muted);
+      cursor: pointer;
+    }
+
+    /* Main Scrollable Contacts List */
+    .contact-list-container {
+      flex: 1;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      padding-bottom: max(34px, env(safe-area-inset-bottom, 34px));
+    }
+
+    /* My Card */
+    .my-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-bottom: 0.5px solid var(--separator);
+      cursor: pointer;
+    }
+    .my-card-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: var(--avatar-bg);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .my-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .my-card-name {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .my-card-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Alphabet Section Headers */
+    .section-header {
+      padding: 6px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    /* Contact Row */
+    .contact-row {
+      padding: 12px 16px;
+      font-size: 17px;
+      font-weight: 400;
+      letter-spacing: -0.2px;
+      border-bottom: 0.5px solid var(--separator);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .contact-row:active {
+      background: var(--search-bg);
+    }
+    .contact-row .c-name {
+      color: var(--text);
+    }
+    .contact-row .c-name strong {
+      font-weight: 600;
+    }
+    .contact-row .search-match-phone {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-family: ui-monospace, monospace;
+    }
+    .contact-row .search-highlight {
+      color: #ffd60a;
+      font-weight: 700;
+      background: rgba(255, 214, 10, 0.18);
+      padding: 1px 3px;
+      border-radius: 3px;
+    }
+
+    /* Right A-Z Scrubber */
+    .az-scrubber {
+      position: fixed;
+      right: 2px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 8px 4px;
+      touch-action: none;
+    }
+    .az-letter {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      padding: 1.5px 4px;
+      line-height: 1;
+    }
+
+    /* Detail View Sheet */
+    .detail-view {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: max(40px, env(safe-area-inset-bottom, 40px));
+    }
+    .detail-view.open {
+      transform: translateX(0%);
+    }
+
+    .detail-header {
+      padding: 24px 16px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .detail-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: var(--avatar-bg);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .detail-name {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    /* Native Action Pills */
+    .action-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 340px;
+      margin-bottom: 24px;
+    }
+    .action-pill {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 10px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent);
+      cursor: pointer;
+    }
+    .action-pill svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+    .action-pill span {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* Information Groups */
+    .info-group {
+      background: var(--card-bg);
+      border-radius: 12px;
+      margin: 0 16px 16px 16px;
+      overflow: hidden;
+    }
+    .info-row {
+      padding: 14px 16px;
+      border-bottom: 0.5px solid var(--separator);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: capitalize;
+    }
+    .info-value {
+      font-size: 17px;
+      color: var(--accent);
+      word-break: break-word;
+    }
+    .info-value.plain {
+      color: var(--text);
+    }
+    .info-value.note-val {
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.4;
+      white-space: pre-line;
+    }
+
+    /* Settings Modal Sheet (Covert PIN 2769) */
+    .settings-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .settings-modal.open {
+      display: flex;
+    }
+    .settings-sheet {
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      background: var(--card-bg);
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: scroll;
+      box-sizing: border-box;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    }
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 0.5px solid var(--separator);
+      padding-bottom: 12px;
+    }
+    .settings-header h3 { margin: 0; font-size: 20px; font-weight: 700; }
+    .settings-close-btn {
+      background: var(--secondary-bg);
+      border: none;
+      color: var(--accent);
+      padding: 6px 14px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .set-group {
+      background: var(--secondary-bg);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .set-group-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+    .set-input-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .set-input-row label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .set-input-row input, .set-input-row textarea, .set-input-row select {
+      background: var(--card-bg);
+      border: 1px solid var(--separator);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+    }
+    .set-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+    .set-btn.alt {
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+    }
+    .set-btn.danger {
+      background: var(--red);
+    }
+
+    /* Status indicator */
+    .phase-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      background: rgba(48, 209, 88, 0.16);
+      color: var(--green);
+      width: fit-content;
+    }
+  </style>
+</head>
+<body class="theme-dark">
+
+<div id="app">
+  <!-- Top Bar -->
+  <div class="nav-bar">
+    <div class="nav-left">
+      <button class="nav-btn" id="listsBtn">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Lists
+      </button>
+    </div>
+    <div class="nav-title" id="navTitle">Contacts</div>
+    <div class="nav-right">
+      <button class="nav-btn" id="addContactBtn">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Large Title -->
+  <div class="large-header">
+    <h1 class="large-title">Contacts</h1>
+  </div>
+
+  <!-- Search Bar (PIN 2769 unlocks Settings) -->
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2" fill="none"/><line x1="16.5" y1="16.5" x2="21.5" y2="21.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    <input type="text" class="search-box" id="searchInput" placeholder="Search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <svg class="mic-icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </div>
+
+  <!-- Main Scrollable List -->
+  <div class="contact-list-container" id="contactList">
+    <!-- My Card -->
+    <div class="my-card" id="myCardBtn">
+      <div class="my-card-avatar" id="myCardInitials">RD</div>
+      <div class="my-card-info">
+        <div class="my-card-name" id="myCardName">Robert Dolan</div>
+        <div class="my-card-sub">My Card</div>
+      </div>
+    </div>
+
+    <!-- Contacts Rendered Dynamically -->
+    <div id="contactsContent"></div>
+  </div>
+
+  <!-- Right A-Z Scrubber -->
+  <div class="az-scrubber" id="azScrubber"></div>
+
+  <!-- Contact Detail View Sheet -->
+  <div class="detail-view" id="detailView">
+    <div class="nav-bar" style="position: sticky; top: 0;">
+      <div class="nav-left">
+        <button class="nav-btn" id="detailBackBtn">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Contacts
+        </button>
+      </div>
+      <div class="nav-title"></div>
+      <div class="nav-right">
+        <button class="nav-btn" style="font-weight: 600;">Edit</button>
+      </div>
+    </div>
+
+    <div class="detail-header">
+      <div class="detail-avatar" id="detailAvatar">--</div>
+      <div class="detail-name" id="detailName">--</div>
+
+      <div class="action-row">
+        <div class="action-pill"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>message</span></div>
+        <div class="action-pill"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>call</span></div>
+        <div class="action-pill"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span>FaceTime</span></div>
+        <div class="action-pill"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>mail</span></div>
+      </div>
+    </div>
+
+    <div class="info-group">
+      <div class="info-row">
+        <span class="info-label">mobile</span>
+        <span class="info-value" id="detailPhone">--</span>
+      </div>
+      <div class="info-row" id="detailBdayRow">
+        <span class="info-label">birthday</span>
+        <span class="info-value plain" id="detailBday">--</span>
+      </div>
+    </div>
+
+    <div class="info-group" id="detailAddressGroup">
+      <div class="info-row">
+        <span class="info-label">home</span>
+        <span class="info-value plain" id="detailAddress">--</span>
+      </div>
+    </div>
+
+    <div class="info-group" id="detailNoteGroup">
+      <div class="info-row">
+        <span class="info-label">notes</span>
+        <span class="info-value note-val" id="detailNotes">--</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Covert Settings Modal (Opened by PIN 2769) -->
+  <div class="settings-modal" id="settingsModal">
+    <div class="settings-sheet">
+      <div class="settings-header">
+        <h3>Hypermnesia Settings</h3>
+        <button class="settings-close-btn" id="closeSettingsBtn">Done</button>
+      </div>
+
+      <!-- Current State Badge -->
+      <div class="set-group">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="set-group-title">Routine State Machine</span>
+          <span class="phase-badge" id="settingsPhaseBadge">PHASE 1: PHONE / DOB</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="set-btn alt" style="flex:1;" onclick="setRoutinePhase(1)">Phase 1</button>
+          <button class="set-btn alt" style="flex:1;" onclick="setRoutinePhase(2)">Phase 2</button>
+          <button class="set-btn alt" style="flex:1;" onclick="setRoutinePhase(3)">Phase 3</button>
+        </div>
+        <button class="set-btn" onclick="resetRoutine()">↺ Reset to Phase 1</button>
+      </div>
+
+      <!-- Import Contact List (.vcf) -->
+      <div class="set-group">
+        <span class="set-group-title">Import Custom Contacts (.vcf)</span>
+        <p style="font-size:13px; color:var(--text-muted); margin:0;">
+          Export from your iPhone Contacts app: <b>Lists &gt; All Contacts (hold) &gt; Export &gt; Save to Files</b>, then select it below:
+        </p>
+        <input type="file" id="vcfFileInput" accept=".vcf,text/vcard" style="display:none;">
+        <button class="set-btn" onclick="document.getElementById('vcfFileInput').click()">📂 Select .vcf File from iPhone</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-muted);">
+          <span>Loaded Contacts: <b id="loadedCountLabel" style="color:var(--text);">500</b></span>
+          <a href="#" style="color:var(--accent); text-decoration:none;" onclick="restoreDefaultContacts(); return false;">Restore 500 Defaults</a>
+        </div>
+      </div>
+
+      <!-- Anchor 1 Customization (Phase 1) -->
+      <div class="set-group">
+        <span class="set-group-title">Anchor 1: Phone &amp; Birthday Force</span>
+        <div class="set-input-row">
+          <label>Full Name</label>
+          <input type="text" id="a1Name" value="Liam Henderson">
+        </div>
+        <div class="set-input-row">
+          <label>Phone Number (10 digits)</label>
+          <input type="text" id="a1Phone" value="(212) 849-2041">
+        </div>
+        <div class="set-input-row">
+          <label>Birthday</label>
+          <input type="text" id="a1Bday" value="October 14">
+        </div>
+        <div class="set-input-row">
+          <label>Home Address</label>
+          <input type="text" id="a1Address" value="342 W 57th St, New York, NY 10019">
+        </div>
+      </div>
+
+      <!-- Anchor 2 Customization (Phase 2) -->
+      <div class="set-group">
+        <span class="set-group-title">Anchor 2: Deep Notes &amp; Security Force</span>
+        <div class="set-input-row">
+          <label>Full Name</label>
+          <input type="text" id="a2Name" value="Elena Rostova">
+        </div>
+        <div class="set-input-row">
+          <label>Phone Number</label>
+          <input type="text" id="a2Phone" value="(415) 672-9183">
+        </div>
+        <div class="set-input-row">
+          <label>Secret Notes (Door code, allergies, car)</label>
+          <textarea id="a2Notes" rows="2">Door Code: 4821 • Severe allergy to shellfish • Drives a 1988 Porsche 911</textarea>
+        </div>
+      </div>
+
+      <!-- Anchor 3 Customization (Phase 3) -->
+      <div class="set-group">
+        <span class="set-group-title">Anchor 3: 3-Digit Reverse Search Target</span>
+        <div class="set-input-row">
+          <label>Full Name</label>
+          <input type="text" id="a3Name" value="Julian Mercer">
+        </div>
+        <div class="set-input-row">
+          <label>Base Area Code &amp; Prefix</label>
+          <input type="text" id="a3Prefix" value="(555)">
+        </div>
+        <div class="set-input-row">
+          <label>Notes</label>
+          <input type="text" id="a3Notes" value="Private line • VIP Client">
+        </div>
+      </div>
+
+      <!-- Theme & Appearance -->
+      <div class="set-group">
+        <span class="set-group-title">Appearance &amp; My Card</span>
+        <div class="set-input-row">
+          <label>My Card Name</label>
+          <input type="text" id="setMyName" value="Robert Dolan">
+        </div>
+        <div class="set-input-row">
+          <label>Theme</label>
+          <select id="themeSelect">
+            <option value="dark">Dark Mode</option>
+            <option value="light">Light Mode</option>
+            <option value="auto">System Match</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // Configuration & State
+  const SETTINGS_PIN = "2769";
+  let routinePhase = 1; // 1 = Liam, 2 = Elena, 3 = Julian Search
+  let contacts = [];
+  let isSearchActive = false;
+  let activeDetailContact = null;
+
+  // Anchors (Default 3 Force Targets)
+  let anchors = {
+    a1: {
+      id: "anchor_1",
+      firstName: "Liam",
+      lastName: "Henderson",
+      name: "Liam Henderson",
+      phone: "(212) 849-2041",
+      bday: "October 14",
+      address: "342 W 57th St, New York, NY 10019",
+      notes: "Met at Manhattan corporate dinner"
+    },
+    a2: {
+      id: "anchor_2",
+      firstName: "Elena",
+      lastName: "Rostova",
+      name: "Elena Rostova",
+      phone: "(415) 672-9183",
+      bday: "May 22",
+      address: "742 Montgomery St, San Francisco, CA 94111",
+      notes: "Door Code: 4821 • Severe allergy to shellfish • Drives a 1988 Porsche 911"
+    },
+    a3: {
+      id: "anchor_3",
+      firstName: "Julian",
+      lastName: "Mercer",
+      name: "Julian Mercer",
+      phone: "(555) 742-1984",
+      bday: "August 9",
+      address: "100 Wall St, New York, NY 10005",
+      notes: "Private line • VIP Client"
+    }
+  };
+
+  // Load Saved Settings from LocalStorage
+  function loadSavedConfig() {
+    try {
+      const savedAnchors = localStorage.getItem("hyp_anchors");
+      if (savedAnchors) anchors = JSON.parse(savedAnchors);
+      const savedPhase = localStorage.getItem("hyp_phase");
+      if (savedPhase) routinePhase = Number(savedPhase) || 1;
+      const savedMyName = localStorage.getItem("hyp_my_name");
+      if (savedMyName) {
+        document.getElementById("myCardName").textContent = savedMyName;
+        document.getElementById("setMyName").value = savedMyName;
+        const inits = savedMyName.split(" ").map(w => w[0]).join("").toUpperCase();
+        document.getElementById("myCardInitials").textContent = inits || "ME";
+      }
+      const savedTheme = localStorage.getItem("hyp_theme") || "dark";
+      setTheme(savedTheme);
+      document.getElementById("themeSelect").value = savedTheme;
+    } catch (_) {}
+  }
+
+  function saveConfig() {
+    try {
+      localStorage.setItem("hyp_anchors", JSON.stringify(anchors));
+      localStorage.setItem("hyp_phase", String(routinePhase));
+    } catch (_) {}
+  }
+
+  function setTheme(t) {
+    document.body.className = (t === "light") ? "theme-light" : (t === "auto" ? "theme-auto" : "theme-dark");
+    try { localStorage.setItem("hyp_theme", t); } catch(_) {}
+  }
+
+  // Generate 500 Default Hyper-Realistic Contacts
+  function generateDefaultContacts() {
+    const FIRST_NAMES = [
+      "Alexander", "Amelia", "Anthony", "Aria", "Asher", "Ava", "Benjamin", "Brooke", "Caleb", "Charlotte",
+      "Chloe", "Christian", "Daniel", "David", "Dominic", "Eleanor", "Eli", "Elizabeth", "Ella", "Emily",
+      "Ethan", "Eva", "Evelyn", "Ezra", "Gabriel", "Grace", "Hannah", "Harper", "Henry", "Isaac",
+      "Isabella", "Jack", "Jacob", "James", "Jasmine", "Jasper", "Jordan", "Joseph", "Joshua", "Julian",
+      "Kai", "Leo", "Levi", "Liam", "Lily", "Lucas", "Lucy", "Luke", "Madelyn", "Mason",
+      "Mateo", "Maya", "Mia", "Michael", "Mila", "Miles", "Nathan", "Nolan", "Nora", "Oliver",
+      "Olivia", "Owen", "Penelope", "Roman", "Ruby", "Ryan", "Samuel", "Sarah", "Sebastian", "Silas",
+      "Sophia", "Stella", "Theodore", "Thomas", "Violet", "William", "Wyatt", "Zackary", "Zara", "Zoe"
+    ];
+
+    const LAST_NAMES = [
+      "Adams", "Anderson", "Baker", "Barnes", "Bell", "Bennett", "Brooks", "Campbell", "Carter", "Clark",
+      "Collins", "Cooper", "Davis", "Diaz", "Edwards", "Evans", "Foster", "Garcia", "Gray", "Green",
+      "Hall", "Harris", "Hayes", "Henderson", "Hill", "Howard", "Hughes", "Jackson", "Jenkins", "Johnson",
+      "Kelly", "King", "Lewis", "Long", "Marshall", "Martin", "Martinez", "Miller", "Mitchell", "Moore",
+      "Morgan", "Morris", "Murphy", "Nelson", "Parker", "Perez", "Peterson", "Phillips", "Price", "Reed",
+      "Reyes", "Richardson", "Rivera", "Roberts", "Robinson", "Rodriguez", "Ross", "Rostova", "Russell", "Scott",
+      "Simmons", "Smith", "Stewart", "Taylor", "Thomas", "Thompson", "Torres", "Turner", "Vance", "Walker",
+      "Ward", "Watson", "White", "Williams", "Wilson", "Wood", "Wright", "Young"
+    ];
+
+    const CITIES = [
+      "New York, NY", "Brooklyn, NY", "Boston, MA", "Greenwich, CT", "Philadelphia, PA",
+      "Chicago, IL", "Austin, TX", "Dallas, TX", "Denver, CO", "San Francisco, CA", "Seattle, WA"
+    ];
+
+    const list = [];
+    let count = 0;
+
+    for (let f of FIRST_NAMES) {
+      for (let l of LAST_NAMES) {
+        if (count >= 520) break;
+        // Skip names that clash with our 3 anchors
+        if ((f === "Liam" && l === "Henderson") || (f === "Elena" && l === "Rostova") || (f === "Julian" && l === "Mercer")) continue;
+
+        const area = [212, 646, 917, 347, 415, 617, 203, 312, 773, 206][count % 10];
+        const mid = String(100 + (count * 7) % 899).padStart(3, "0");
+        const end = String(1000 + (count * 13) % 8999);
+        const city = CITIES[count % CITIES.length];
+
+        list.push({
+          id: `c_${count}`,
+          firstName: f,
+          lastName: l,
+          name: `${f} ${l}`,
+          phone: `(${area}) ${mid}-${end}`,
+          bday: `${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][count % 12]} ${(count % 28) + 1}`,
+          address: `${100 + (count * 3) % 899} Main St, ${city}`,
+          notes: (count % 7 === 0) ? `Acquaintance from ${city}` : ""
+        });
+        count++;
+      }
+    }
+
+    // Blend the 3 anchors naturally into their alphabetical places
+    list.push(anchors.a1);
+    list.push(anchors.a2);
+    list.push(anchors.a3);
+
+    // Sort alphabetically by Last Name, then First Name
+    list.sort((a, b) => a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName));
+
+    return list;
+  }
+
+  function initContacts() {
+    try {
+      const stored = localStorage.getItem("hyp_custom_contacts");
+      if (stored) {
+        contacts = JSON.parse(stored);
+        ensureAnchorsInList();
+      } else {
+        contacts = generateDefaultContacts();
+      }
+    } catch (_) {
+      contacts = generateDefaultContacts();
+    }
+    renderContactsList(contacts);
+  }
+
+  function ensureAnchorsInList() {
+    // Make sure anchors are in the contact list without duplicates
+    const aIds = new Set(["anchor_1", "anchor_2", "anchor_3"]);
+    contacts = contacts.filter(c => !aIds.has(c.id));
+    contacts.push(anchors.a1);
+    contacts.push(anchors.a2);
+    contacts.push(anchors.a3);
+    contacts.sort((a, b) => (a.lastName || "").localeCompare(b.lastName || "") || (a.firstName || "").localeCompare(b.firstName || ""));
+  }
+
+  // Render Contacts into Groups (A-Z)
+  function renderContactsList(items) {
+    const container = document.getElementById("contactsContent");
+    container.innerHTML = "";
+
+    const groups = {};
+    for (let c of items) {
+      const letter = ((c.lastName && c.lastName[0]) || (c.firstName && c.firstName[0]) || "#").toUpperCase();
+      const key = (letter >= "A" && letter <= "Z") ? letter : "#";
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(c);
+    }
+
+    const sortedLetters = Object.keys(groups).sort((a, b) => {
+      if (a === "#") return -1;
+      if (b === "#") return 1;
+      return a.localeCompare(b);
+    });
+
+    for (let letter of sortedLetters) {
+      const secHeader = document.createElement("div");
+      secHeader.className = "section-header";
+      secHeader.id = `sec_${letter}`;
+      secHeader.textContent = letter;
+      container.appendChild(secHeader);
+
+      for (let c of groups[letter]) {
+        const row = document.createElement("div");
+        row.className = "contact-row";
+        row.dataset.id = c.id;
+
+        const isA1 = (c.id === "anchor_1");
+        const isA2 = (c.id === "anchor_2");
+        const isA3 = (c.id === "anchor_3");
+
+        let matchSnippet = "";
+        if (isSearchActive && c._matchedPhone) {
+          matchSnippet = `<span class="search-match-phone">${c._matchedPhone}</span>`;
+        }
+
+        row.innerHTML = `
+          <div class="c-name">${c.firstName} <strong>${c.lastName}</strong></div>
+          ${matchSnippet}
+        `;
+
+        row.onclick = () => openContactDetail(c);
+        container.appendChild(row);
+      }
+    }
+
+    renderScrubber(sortedLetters);
+    document.getElementById("loadedCountLabel").textContent = String(contacts.length);
+  }
+
+  // Right Edge A-Z Touch Scrubber
+  function renderScrubber(letters) {
+    const scrub = document.getElementById("azScrubber");
+    scrub.innerHTML = "";
+    const all = ["#", "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+    for (let l of all) {
+      const sp = document.createElement("span");
+      sp.className = "az-letter";
+      sp.textContent = l;
+      sp.dataset.l = l;
+      scrub.appendChild(sp);
+    }
+
+    scrub.onpointerdown = scrub.onpointermove = (e) => {
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      if (el && el.dataset && el.dataset.l) {
+        scrollToSection(el.dataset.l);
+      }
+    };
+  }
+
+  function scrollToSection(letter) {
+    const el = document.getElementById(`sec_${letter}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  // --- THE INERTIAL SCROLL FORCE ENGINE ---
+  const listEl = document.getElementById("contactList");
+  let isTouching = false;
+  let forceSnapTimer = null;
+
+  listEl.addEventListener("touchstart", () => {
+    isTouching = true;
+    clearTimeout(forceSnapTimer);
+  }, { passive: true });
+
+  listEl.addEventListener("touchend", () => {
+    isTouching = false;
+    // When finger lifts, let momentum run briefly, then softly glide into the force target
+    scheduleForceSnapping();
+  }, { passive: true });
+
+  listEl.addEventListener("scroll", () => {
+    if (!isTouching) {
+      clearTimeout(forceSnapTimer);
+      forceSnapTimer = setTimeout(performMagneticGlide, 180);
+    }
+  }, { passive: true });
+
+  function scheduleForceSnapping() {
+    clearTimeout(forceSnapTimer);
+    forceSnapTimer = setTimeout(performMagneticGlide, 450);
+  }
+
+  function performMagneticGlide() {
+    if (isSearchActive || isTouching) return;
+
+    // Find the target element for current phase
+    const targetId = (routinePhase === 1) ? "anchor_1" : (routinePhase === 2 ? "anchor_2" : null);
+    if (!targetId) return;
+
+    const row = document.querySelector(`.contact-row[data-id="${targetId}"]`);
+    if (!row) return;
+
+    const listRect = listEl.getBoundingClientRect();
+    const rowRect = row.getBoundingClientRect();
+
+    // Center the target row directly in the middle of viewport
+    const offset = rowRect.top - listRect.top - (listRect.height / 2) + (rowRect.height / 2);
+    
+    // Only smooth-scroll if it's within natural momentum reach
+    listEl.scrollBy({ top: offset, behavior: "smooth" });
+  }
+
+  // Open Contact Detail
+  function openContactDetail(c) {
+    activeDetailContact = c;
+    const dv = document.getElementById("detailView");
+    const inits = `${(c.firstName && c.firstName[0]) || ""}${(c.lastName && c.lastName[0]) || ""}`.toUpperCase();
+
+    document.getElementById("detailAvatar").textContent = inits || "👤";
+    document.getElementById("detailName").textContent = c.name;
+    document.getElementById("detailPhone").textContent = c.phone || "None";
+    document.getElementById("detailBday").textContent = c.bday || "None";
+    document.getElementById("detailAddress").textContent = c.address || "None";
+    document.getElementById("detailNotes").textContent = c.notes || "None";
+
+    document.getElementById("detailBdayRow").style.display = c.bday ? "flex" : "none";
+    document.getElementById("detailAddressGroup").style.display = c.address ? "block" : "none";
+    document.getElementById("detailNoteGroup").style.display = c.notes ? "block" : "none";
+
+    dv.classList.add("open");
+  }
+
+  // Back Button (< Contacts) -> Advance to Next Routine Phase!
+  document.getElementById("detailBackBtn").onclick = () => {
+    document.getElementById("detailView").classList.remove("open");
+    // Advance phase automatically
+    if (routinePhase === 1) {
+      routinePhase = 2;
+    } else if (routinePhase === 2) {
+      routinePhase = 3;
+    }
+    updatePhaseUI();
+    saveConfig();
+  };
+
+  function updatePhaseUI() {
+    const badge = document.getElementById("settingsPhaseBadge");
+    if (!badge) return;
+    if (routinePhase === 1) {
+      badge.textContent = "PHASE 1: PHONE / DOB (" + anchors.a1.name + ")";
+    } else if (routinePhase === 2) {
+      badge.textContent = "PHASE 2: NOTES / SECURITY (" + anchors.a2.name + ")";
+    } else {
+      badge.textContent = "PHASE 3: 3-DIGIT SEARCH (" + anchors.a3.name + ")";
+    }
+  }
+
+  window.setRoutinePhase = function(p) {
+    routinePhase = p;
+    updatePhaseUI();
+    saveConfig();
+  };
+
+  window.resetRoutine = function() {
+    routinePhase = 1;
+    updatePhaseUI();
+    saveConfig();
+    document.getElementById("searchInput").value = "";
+    isSearchActive = false;
+    renderContactsList(contacts);
+    closeSettings();
+  };
+
+  // --- SEARCH BAR & PHASE 3 DYNAMIC 3-DIGIT SEARCH ---
+  const searchInput = document.getElementById("searchInput");
+
+  searchInput.addEventListener("input", (e) => {
+    const val = e.target.value.trim();
+
+    // COVERT PIN CHECK: 2769 opens Settings!
+    if (val === SETTINGS_PIN) {
+      e.target.value = "";
+      e.target.blur();
+      openSettings();
+      return;
+    }
+
+    if (!val) {
+      isSearchActive = false;
+      renderContactsList(contacts);
+      return;
+    }
+
+    isSearchActive = true;
+
+    // Check if the user entered 3 digits (e.g. "834")
+    const digitsOnly = val.replace(/\D/g, "");
+    if (digitsOnly.length === 3) {
+      handleThreeDigitReverseSearch(digitsOnly);
+      return;
+    }
+
+    // Normal Standard Search by name/phone
+    const q = val.toLowerCase();
+    const filtered = contacts.filter(c => 
+      c.name.toLowerCase().includes(q) || (c.phone && c.phone.includes(q))
+    );
+    renderContactsList(filtered);
+  });
+
+  function handleThreeDigitReverseSearch(threeDigits) {
+    // Dynamic 3-Digit Force:
+    // Format Julian Mercer's phone number to highlight the exact 3 digits!
+    const prefix = document.getElementById("a3Prefix") ? document.getElementById("a3Prefix").value : "(555)";
+    const customPhone = `${prefix} ${threeDigits}-4819`;
+    
+    // Highlighted HTML for the contact row
+    const highlightedPhone = `${prefix} <span class="search-highlight">${threeDigits}</span>-4819`;
+
+    const forcedJulian = Object.assign({}, anchors.a3, {
+      phone: customPhone,
+      _matchedPhone: highlightedPhone
+    });
+
+    renderContactsList([forcedJulian]);
+  }
+
+  // --- COVERT SETTINGS MODAL ---
+  function openSettings() {
+    document.getElementById("a1Name").value = anchors.a1.name;
+    document.getElementById("a1Phone").value = anchors.a1.phone;
+    document.getElementById("a1Bday").value = anchors.a1.bday;
+    document.getElementById("a1Address").value = anchors.a1.address;
+
+    document.getElementById("a2Name").value = anchors.a2.name;
+    document.getElementById("a2Phone").value = anchors.a2.phone;
+    document.getElementById("a2Notes").value = anchors.a2.notes;
+
+    document.getElementById("a3Name").value = anchors.a3.name;
+    document.getElementById("a3Notes").value = anchors.a3.notes;
+
+    updatePhaseUI();
+    document.getElementById("settingsModal").classList.add("open");
+  }
+
+  function closeSettings() {
+    // Save any edited anchors
+    anchors.a1.name = document.getElementById("a1Name").value.trim() || anchors.a1.name;
+    anchors.a1.phone = document.getElementById("a1Phone").value.trim() || anchors.a1.phone;
+    anchors.a1.bday = document.getElementById("a1Bday").value.trim() || anchors.a1.bday;
+    anchors.a1.address = document.getElementById("a1Address").value.trim() || anchors.a1.address;
+
+    anchors.a2.name = document.getElementById("a2Name").value.trim() || anchors.a2.name;
+    anchors.a2.phone = document.getElementById("a2Phone").value.trim() || anchors.a2.phone;
+    anchors.a2.notes = document.getElementById("a2Notes").value.trim() || anchors.a2.notes;
+
+    anchors.a3.name = document.getElementById("a3Name").value.trim() || anchors.a3.name;
+    anchors.a3.notes = document.getElementById("a3Notes").value.trim() || anchors.a3.notes;
+
+    const myName = document.getElementById("setMyName").value.trim();
+    if (myName) {
+      document.getElementById("myCardName").textContent = myName;
+      document.getElementById("myCardInitials").textContent = myName.split(" ").map(w=>w[0]).join("").toUpperCase();
+      try { localStorage.setItem("hyp_my_name", myName); } catch(_) {}
+    }
+
+    saveConfig();
+    ensureAnchorsInList();
+    renderContactsList(contacts);
+
+    document.getElementById("settingsModal").classList.remove("open");
+  }
+
+  document.getElementById("closeSettingsBtn").onclick = closeSettings;
+  document.getElementById("themeSelect").onchange = (e) => setTheme(e.target.value);
+
+  // --- FAST .VCF (vCard) PARSER ---
+  const vcfInput = document.getElementById("vcfFileInput");
+  vcfInput.addEventListener("change", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const parsed = parseVCard(text);
+      if (parsed.length > 0) {
+        contacts = parsed;
+        ensureAnchorsInList();
+        try {
+          localStorage.setItem("hyp_custom_contacts", JSON.stringify(contacts));
+        } catch(_) {}
+        renderContactsList(contacts);
+        alert(`✓ Successfully imported ${parsed.length} contacts!`);
+      } else {
+        alert("Could not parse any contacts from this .vcf file.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error reading file: " + err.message);
+    }
+  });
+
+  function parseVCard(vcfText) {
+    const cards = vcfText.split(/BEGIN:VCARD/i).slice(1);
+    const parsed = [];
+
+    cards.forEach((card, idx) => {
+      const lines = card.split(/\r?\n/);
+      let fn = "", ln = "", phone = "", bday = "", adr = "", notes = "";
+
+      lines.forEach(line => {
+        const clean = line.trim();
+        if (clean.startsWith("FN:") || clean.startsWith("FN;")) {
+          fn = clean.split(":")[1] || "";
+        } else if (clean.startsWith("N:") || clean.startsWith("N;")) {
+          const parts = (clean.split(":")[1] || "").split(";");
+          ln = parts[0] || "";
+          if (!fn && parts[1]) fn = `${parts[1]} ${ln}`.trim();
+        } else if ((clean.startsWith("TEL") || clean.startsWith("item1.TEL")) && !phone) {
+          phone = clean.split(":")[1] || "";
+        } else if (clean.startsWith("BDAY:")) {
+          bday = clean.split(":")[1] || "";
+        } else if (clean.startsWith("ADR") && !adr) {
+          const parts = (clean.split(":")[1] || "").split(";");
+          adr = parts.filter(Boolean).join(", ");
+        } else if (clean.startsWith("NOTE:")) {
+          notes = clean.split(":")[1] || "";
+        }
+      });
+
+      if (fn || ln) {
+        const fullName = fn || ln;
+        const nameParts = fullName.split(" ");
+        const first = nameParts[0] || "";
+        const last = nameParts.slice(1).join(" ") || ln || first;
+
+        parsed.push({
+          id: `custom_${idx}`,
+          firstName: first,
+          lastName: last,
+          name: fullName,
+          phone: phone || "(555) 000-0000",
+          bday: bday || "",
+          address: adr || "",
+          notes: notes || ""
+        });
+      }
+    });
+
+    return parsed;
+  }
+
+  window.restoreDefaultContacts = function() {
+    try { localStorage.removeItem("hyp_custom_contacts"); } catch(_) {}
+    contacts = generateDefaultContacts();
+    renderContactsList(contacts);
+    alert("Restored 500 default realistic contacts.");
+  };
+
+  // Initialize
+  loadSavedConfig();
+  initContacts();
+})();
+</script>
+</body>
+</html>
